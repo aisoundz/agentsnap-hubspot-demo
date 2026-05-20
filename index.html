@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AgentSnap MCP — Live Demo</title>
-<meta name="description" content="AgentSnap is an MCP server for insurance agencies. Try the interactive demo in your browser — 18 real workflows from daily briefing to AMS sync.">
+<meta name="description" content="AgentSnap is an MCP server that runs in Claude Desktop. Operations work for insurance agencies — renewals, invoices, claims, commissions — synced to HubSpot, AMS 360, or HawkSoft.">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -44,7 +44,17 @@
     flex-shrink: 0;
   }
   .logo { display: flex; align-items: center; gap: 14px; }
-  .logo .mark {
+  .logo-link {
+    display: inline-flex; align-items: center; gap: 10px;
+    text-decoration: none;
+  }
+  .logo-img {
+    height: 32px; width: auto; display: block;
+  }
+  .logo-fallback {
+    align-items: center; gap: 10px;
+  }
+  .logo-fallback .mark {
     width: 30px; height: 30px;
     background: linear-gradient(135deg, var(--green), var(--green-dark));
     border-radius: 8px;
@@ -52,11 +62,11 @@
     font-weight: 800; font-size: 16px;
     box-shadow: 0 1px 3px rgba(46, 138, 46, 0.4);
   }
-  .logo .word {
+  .logo-fallback .word {
     font-weight: 700; font-size: 17px; color: var(--text);
     letter-spacing: -0.01em;
   }
-  .logo .word .accent { color: var(--green-bright); }
+  .logo-fallback .word .accent { color: var(--green-bright); }
   .logo-divider { width: 1px; height: 28px; background: #2a2a2a; }
   .logo-sub {
     font-size: 11.5px; color: var(--text-muted); letter-spacing: 0.01em;
@@ -131,29 +141,83 @@
   .messages::-webkit-scrollbar { width: 4px; }
   .messages::-webkit-scrollbar-thumb { background: #2a3a2a; border-radius: 4px; }
 
-  /* Welcome screen */
+  /* Welcome screen — redesigned */
   .welcome {
-    max-width: 600px; margin: 60px auto 0; padding: 0 28px;
-    text-align: center; color: var(--text-muted);
+    max-width: 680px;
+    margin: 56px auto 0;
+    padding: 0 32px;
+    text-align: center;
+  }
+  .welcome .eyebrow {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--green-bright);
+    background: rgba(46, 138, 46, 0.08);
+    border: 1px solid rgba(46, 138, 46, 0.25);
+    border-radius: 999px;
+    padding: 5px 14px;
+    margin-bottom: 22px;
   }
   .welcome h1 {
-    font-size: 24px; color: var(--text); margin-bottom: 8px;
-    letter-spacing: -0.01em; font-weight: 700;
+    font-size: 30px;
+    line-height: 1.15;
+    color: var(--text);
+    margin-bottom: 14px;
+    letter-spacing: -0.02em;
+    font-weight: 700;
   }
-  .welcome p { font-size: 14.5px; line-height: 1.6; margin-bottom: 24px; }
-  .welcome p strong { color: var(--green-bright); font-weight: 600; }
-  .welcome .hint {
-    background: #0d1a0d; border: 1px solid #1e3a1e;
-    border-radius: 8px; padding: 14px 18px;
-    font-size: 13px; color: #6dcf6d;
-    display: inline-block; text-align: left;
+  .welcome .lede {
+    font-size: 15.5px;
+    line-height: 1.6;
+    color: #a0a8a0;
+    margin-bottom: 28px;
+    max-width: 560px;
+    margin-left: auto;
+    margin-right: auto;
   }
-  .welcome .hint kbd {
-    background: #1a2a1a; border: 1px solid #2a4a2a;
-    border-radius: 3px; padding: 2px 7px;
-    font-family: 'SF Mono', monospace; font-size: 11px;
-    color: var(--green-bright); margin: 0 2px;
+  .welcome .lede strong { color: var(--text); font-weight: 600; }
+  .welcome .qs-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
   }
+  .quick-starts {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 28px;
+  }
+  .qs-pill {
+    background: #131c13;
+    border: 1px solid #1e3a1e;
+    color: #b0d8b0;
+    border-radius: 8px;
+    padding: 9px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+    line-height: 1.3;
+  }
+  .qs-pill:hover {
+    background: #1a2a1a;
+    border-color: var(--green);
+    color: var(--green-bright);
+    transform: translateY(-1px);
+  }
+  .welcome .walk-hint {
+    font-size: 13.5px;
+    color: var(--text-muted);
+    margin-top: 8px;
+  }
+  .welcome .walk-hint strong { color: var(--green-bright); font-weight: 600; }
 
   .msg-row {
     display: flex; gap: 14px;
@@ -244,6 +308,98 @@
     color: var(--green-bright);
   }
 
+  /* ── Completion screen (replaces "Done" disabled state) ── */
+  .completion {
+    max-width: 640px;
+    margin: 40px auto 0;
+    padding: 32px;
+    background: linear-gradient(180deg, #0d1a0d 0%, #0a140a 100%);
+    border: 1px solid #1e3a1e;
+    border-radius: 16px;
+    text-align: center;
+    animation: fadeUp 0.4s ease forwards;
+  }
+  .completion .badge-done {
+    display: inline-block;
+    background: rgba(74, 222, 128, 0.12);
+    border: 1px solid rgba(74, 222, 128, 0.4);
+    color: var(--green-bright);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 999px;
+    margin-bottom: 18px;
+  }
+  .completion h2 {
+    font-size: 26px;
+    line-height: 1.2;
+    color: var(--text);
+    margin-bottom: 14px;
+    letter-spacing: -0.01em;
+    font-weight: 700;
+  }
+  .completion p {
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: #a0a8a0;
+    margin-bottom: 14px;
+    max-width: 520px;
+    margin-left: auto; margin-right: auto;
+  }
+  .completion .emphasis {
+    color: var(--text);
+    font-weight: 600;
+    font-size: 16px;
+    margin-top: 18px;
+    margin-bottom: 18px;
+  }
+  .completion-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+  .cta-primary, .cta-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 22px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 14px;
+    text-decoration: none;
+    transition: transform 0.1s, opacity 0.15s;
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+  }
+  .cta-primary {
+    background: linear-gradient(135deg, var(--green), var(--green-dark));
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(46, 138, 46, 0.3);
+  }
+  .cta-secondary {
+    background: transparent;
+    color: var(--green-bright);
+    border: 1px solid #2a4a2a;
+  }
+  .cta-primary:hover, .cta-secondary:hover { transform: translateY(-1px); }
+  .completion .restart-link {
+    margin-top: 12px;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  .completion .restart-link a {
+    color: #6dcf6d;
+    text-decoration: none;
+    border-bottom: 1px dashed #2a4a2a;
+    cursor: pointer;
+  }
+  .completion .restart-link a:hover { color: var(--green-bright); }
+
   /* ── Bottom bar ── */
   .bottom-bar {
     border-top:1px solid var(--border);
@@ -286,6 +442,7 @@
 
   .prompt-preview {
     font-size:13px; color:#404040; font-style:italic; flex:1; margin-right:8px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
   .prompt-preview span { color:#5a7a5a; }
   .prompt-preview .note {
@@ -327,11 +484,17 @@
   /* Mobile responsive */
   @media (max-width: 720px) {
     .sidebar { display: none; }
+    .logo-sub { display: none; }
     .bar-row { padding: 10px 16px; flex-wrap: wrap; }
     .prompt-preview { display: none; }
     .input-wrap input { padding-right: 90px; }
     .msg-row { padding: 4px 16px; }
     .welcome { margin-top: 30px; padding: 0 16px; }
+    .welcome h1 { font-size: 24px; }
+    .completion { padding: 24px 18px; margin: 24px 16px; }
+    .completion h2 { font-size: 22px; }
+    .completion-actions { flex-direction: column; }
+    .cta-primary, .cta-secondary { width: 100%; justify-content: center; }
   }
 </style>
 </head>
@@ -339,8 +502,17 @@
 
 <header>
   <div class="logo">
-    <div class="mark">A</div>
-    <div class="word">Agent<span class="accent">Snap</span></div>
+    <a class="logo-link" href="https://github.com/aisoundz/agentsnap-hubspot-demo" target="_blank">
+      <img src="agentsnap-logo.svg"
+           alt="AgentSnap"
+           class="logo-img"
+           id="logo-img"
+           onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='inline-flex';">
+      <span class="logo-fallback" id="logo-fallback" style="display:none;">
+        <span class="mark">A</span>
+        <span class="word">Agent<span class="accent">Snap</span></span>
+      </span>
+    </a>
     <div class="logo-divider"></div>
     <div class="logo-sub">MCP Server · HubSpot · AMS 360 · HawkSoft · SnapRefund</div>
   </div>
@@ -356,12 +528,22 @@
   <div class="chat-area">
     <div class="messages" id="messages">
       <div class="welcome" id="welcome">
-        <h1>Try the AgentSnap demo</h1>
-        <p>Every response below is real output from the MCP server.<br>
-          <strong>Click "Send Next"</strong> to walk the workflow, <strong>jump</strong> to any step on the left, or <strong>type your own question</strong> at the bottom.</p>
-        <div class="hint">
-          Try: <kbd>What's on my plate today?</kbd> &nbsp;·&nbsp; <kbd>Find cross-sell opportunities</kbd> &nbsp;·&nbsp; <kbd>Best carrier this year?</kbd>
+        <div class="eyebrow">Live demo · 18 prompts</div>
+        <h1>This is your Monday morning, automated.</h1>
+        <p class="lede">
+          AgentSnap is an MCP server that runs inside Claude Desktop. It handles renewals, invoices, claims, commissions, and analytics — and syncs every action back to your <strong>HubSpot</strong>, <strong>AMS 360</strong>, or <strong>HawkSoft</strong>. Every response below is real output from the MCP server.
+        </p>
+        <div class="qs-label">Pick a question to start ↓</div>
+        <div class="quick-starts">
+          <button class="qs-pill" data-step="0">What's on my plate today?</button>
+          <button class="qs-pill" data-step="1">Show me the renewal pipeline</button>
+          <button class="qs-pill" data-step="14">Find cross-sell opportunities</button>
+          <button class="qs-pill" data-step="15">Which carrier is my best performer?</button>
+          <button class="qs-pill" data-step="17">Project my Q3 commission</button>
         </div>
+        <p class="walk-hint">
+          — or click <strong>Send Next ›</strong> below to walk a complete morning workflow.
+        </p>
       </div>
     </div>
 
@@ -510,7 +692,7 @@ const STEPS = [
     label: "Confirm",
     user: "Yes, go ahead and confirm it.",
     tool: "agentsnap_confirm_action",
-    keywords: ["yes confirm", "confirm action", "go ahead", "approve it", "do it", "yes go"],
+    keywords: ["yes confirm", "confirm action", "go ahead", "approve it", "yes go"],
     response: `<div class="badge ok">✓ Confirmed — invoice created and synced</div>
 <table class="demo-table" style="margin-top:8px;">
   <tr><th>Field</th><th>Value</th></tr>
@@ -782,7 +964,7 @@ Just reply with answers and I'll have your renewal ready to sign by Friday.<br><
 //   Sidebar groupings
 // ============================================================================
 const GROUPS = [
-  { label: null,                    from: 0,  to: 5  },  // first group has no top section header
+  { label: null,                    from: 0,  to: 5  },
   { label: "Claims",                from: 6,  to: 7  },
   { label: "Financials",            from: 8,  to: 10 },
   { label: "Sync · AMS · HubSpot",  from: 11, to: 13 },
@@ -885,6 +1067,9 @@ function runStep(idx) {
       attachSuggestionClicks();
       updateNav();
       updateBottom();
+      if (current >= STEPS.length) {
+        showCompletion();
+      }
     }, 400);
   }, 300);
 }
@@ -914,19 +1099,57 @@ function updateBottom() {
   counter.textContent = `${Math.min(current + 1, STEPS.length)} / ${STEPS.length}`;
 }
 
+function showCompletion() {
+  // Don't double-render if already shown
+  if (document.getElementById('completion-block')) return;
+
+  const messages = document.getElementById('messages');
+  const block = document.createElement('div');
+  block.className = 'completion';
+  block.id = 'completion-block';
+  block.innerHTML = `
+    <div class="badge-done">✓ Demo complete · 18 / 18</div>
+    <h2>This is what a morning looks like with AgentSnap.</h2>
+    <p>Every response you just saw was real output from the MCP server. Every write action — invoice, claim, refund — would happen in your real HubSpot, AMS 360, or HawkSoft account, gated by the spend cap and audit log.</p>
+    <p class="emphasis">Want to run this against YOUR data?</p>
+    <div class="completion-actions">
+      <a class="cta-primary" href="mailto:anis.taylor@snaprefund.net?subject=AgentSnap%20walkthrough%20request&amp;body=Hi%20Anis%20%E2%80%94%20I%20just%20played%20with%20the%20AgentSnap%20demo%20and%20want%20to%20see%20it%20running%20on%20our%20real%20data.%20Can%20we%20get%2015%20minutes%3F">
+        Book a 15-min walkthrough →
+      </a>
+      <a class="cta-secondary" href="https://github.com/aisoundz/agentsnap-hubspot-demo/releases/download/v1.0/agentsnap-hubspot-demo.zip">
+        Download v1.0 zip ↓
+      </a>
+    </div>
+    <p class="restart-link">Or <a onclick="restart(); return false;">restart the demo</a> to walk it again, or type a custom question below.</p>
+  `;
+  messages.appendChild(block);
+  setTimeout(() => messages.scrollTop = messages.scrollHeight, 100);
+}
+
 function restart() {
   current = 0;
   usedSet.clear();
   const messages = document.getElementById('messages');
   messages.innerHTML = `
     <div class="welcome" id="welcome">
-      <h1>Try the AgentSnap demo</h1>
-      <p>Every response below is real output from the MCP server.<br>
-        <strong>Click "Send Next"</strong> to walk the workflow, <strong>jump</strong> to any step on the left, or <strong>type your own question</strong> at the bottom.</p>
-      <div class="hint">
-        Try: <kbd>What's on my plate today?</kbd> &nbsp;·&nbsp; <kbd>Find cross-sell opportunities</kbd> &nbsp;·&nbsp; <kbd>Best carrier this year?</kbd>
+      <div class="eyebrow">Live demo · 18 prompts</div>
+      <h1>This is your Monday morning, automated.</h1>
+      <p class="lede">
+        AgentSnap is an MCP server that runs inside Claude Desktop. It handles renewals, invoices, claims, commissions, and analytics — and syncs every action back to your <strong>HubSpot</strong>, <strong>AMS 360</strong>, or <strong>HawkSoft</strong>. Every response below is real output from the MCP server.
+      </p>
+      <div class="qs-label">Pick a question to start ↓</div>
+      <div class="quick-starts">
+        <button class="qs-pill" data-step="0">What's on my plate today?</button>
+        <button class="qs-pill" data-step="1">Show me the renewal pipeline</button>
+        <button class="qs-pill" data-step="14">Find cross-sell opportunities</button>
+        <button class="qs-pill" data-step="15">Which carrier is my best performer?</button>
+        <button class="qs-pill" data-step="17">Project my Q3 commission</button>
       </div>
+      <p class="walk-hint">
+        — or click <strong>Send Next ›</strong> below to walk a complete morning workflow.
+      </p>
     </div>`;
+  attachQuickStartClicks();
   document.getElementById('next-preview').innerHTML =
     `<span class="note">Next ▸</span> <span id="next-text">"${STEPS[0].user.slice(0, 65)}"</span>`;
   updateNav();
@@ -955,6 +1178,7 @@ function handleCustomInput() {
         updateNav();
         updateBottom();
         attachSuggestionClicks();
+        if (current >= STEPS.length) showCompletion();
       }, 400);
     }, 300);
   } else {
@@ -1008,6 +1232,14 @@ function attachSuggestionClicks() {
   });
 }
 
+function attachQuickStartClicks() {
+  document.querySelectorAll('.qs-pill').forEach(p => {
+    if (p.dataset.bound) return;
+    p.dataset.bound = '1';
+    p.addEventListener('click', () => runStep(parseInt(p.dataset.step, 10)));
+  });
+}
+
 function escapeHtml(s) {
   return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
@@ -1025,6 +1257,7 @@ document.getElementById('custom-input').addEventListener('keydown', e => {
 });
 
 renderSidebar();
+attachQuickStartClicks();
 updateBottom();
 </script>
 </body>
