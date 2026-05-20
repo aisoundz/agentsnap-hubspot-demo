@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "agentsnap-hubspot-demo": {
+      "command": "/ABSOLUTE/PATH/TO/agentsnap-hubspot-demo/.venv/bin/python",
+      "args": ["/ABSOLUTE/PATH/TO/agentsnap-hubspot-demo/server.py"],
+      "env": {
+        "HUBSPOT_PRIVATE_APP_TOKEN": ""
+      }
+    }
+  }
+}

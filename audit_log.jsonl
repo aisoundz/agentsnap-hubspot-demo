@@ -1,0 +1,5 @@
+{"timestamp": "2026-05-20T20:51:52.218772+00:00", "action": "create_invoice", "agency_id": "agency_demo_001", "invoice_id": 5022, "contact_id": "hs_1001", "carrier": "Hartford", "amount": 1480.0, "confirmed": false}
+{"timestamp": "2026-05-20T20:51:52.219120+00:00", "action": "confirmation_held", "agency_id": "agency_demo_001", "confirmation_id": "conf_94e498274d5e", "amount": 7820.0, "description": "Renewal invoice $7,820.00 for Robert Martinez (Hartford)"}
+{"timestamp": "2026-05-20T20:51:52.219465+00:00", "action": "create_invoice", "agency_id": "agency_demo_001", "invoice_id": 5023, "contact_id": "hs_1006", "carrier": "Hartford", "amount": 7820.0, "confirmed": true}
+{"timestamp": "2026-05-20T20:51:52.219745+00:00", "action": "confirmation_executed", "agency_id": "agency_demo_001", "confirmation_id": "conf_94e498274d5e", "amount": 7820.0, "description": "Renewal invoice $7,820.00 for Robert Martinez (Hartford)", "new_daily_total": 9300.0}
+{"timestamp": "2026-05-20T20:51:52.220076+00:00", "action": "create_claim", "agency_id": "agency_demo_001", "claim_id": "CL-2026-0005", "contact_id": "hs_1002", "carrier": "Progressive", "claim_type": "property"}
