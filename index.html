@@ -1,739 +1,1031 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>AgentSnap MCP — Try the Demo</title>
-<meta name="description" content="AgentSnap is an MCP server that runs in Claude Desktop. Operations work for insurance agencies on HubSpot — renewals, invoices, claims, commissions. Try the interactive demo." />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgentSnap MCP — Live Demo</title>
+<meta name="description" content="AgentSnap is an MCP server for insurance agencies. Try the interactive demo in your browser — 18 real workflows from daily briefing to AMS sync.">
 <style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
   :root {
-    --bg: #0a0e1a;
-    --bg-2: #111729;
-    --fg: #e7ecf3;
-    --fg-2: #9aa7bd;
-    --green: #2bd47e;
-    --green-dim: #15a35d;
-    --accent: #4f8cff;
-    --warning: #f5a524;
-    --rule: #1f2940;
-    --card: #131a2e;
-    --code: #0f1424;
+    --green:        #2E8A2E;
+    --green-dark:   #1d6b1d;
+    --green-bright: #4ade80;
+    --bg:           #111111;
+    --bg-header:    #141414;
+    --bg-sidebar:   #0d0d0d;
+    --bg-card:      #181818;
+    --bg-input:     #1c221c;
+    --border:       #222222;
+    --border-g:     #1e3a1e;
+    --text:         #e8e8e8;
+    --text-muted:   #6a6a6a;
+    --text-dim:     #3e3e3e;
   }
-  * { box-sizing: border-box; }
-  html, body {
-    margin: 0;
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     background: var(--bg);
-    color: var(--fg);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
-    line-height: 1.55;
-    -webkit-font-smoothing: antialiased;
-  }
-  .wrap { max-width: 960px; margin: 0 auto; padding: 48px 24px 96px; }
-
-  /* Hero */
-  .hero { padding: 16px 0 32px; border-bottom: 1px solid var(--rule); }
-  .badge {
-    display: inline-block;
-    font-size: 11px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--green);
-    border: 1px solid var(--green-dim);
-    padding: 4px 10px;
-    border-radius: 999px;
-    margin-bottom: 18px;
-  }
-  h1 {
-    font-size: clamp(32px, 5vw, 48px);
-    line-height: 1.05;
-    margin: 0 0 16px;
-    letter-spacing: -0.02em;
-    font-weight: 700;
-  }
-  .lede {
-    font-size: 18px;
-    color: var(--fg-2);
-    max-width: 720px;
-    margin: 0 0 18px;
-  }
-  .callout {
-    display: inline-block;
-    background: rgba(43, 212, 126, 0.08);
-    border: 1px solid rgba(43, 212, 126, 0.25);
-    color: var(--fg);
-    padding: 8px 14px;
-    border-radius: 8px;
-    font-size: 14px;
-    margin-top: 8px;
+    color: var(--text);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
   }
 
-  /* Section */
-  section { margin-top: 48px; }
-  h2 {
-    font-size: 24px;
-    margin: 0 0 14px;
-    letter-spacing: -0.01em;
-  }
-  h3 { font-size: 16px; margin: 18px 0 8px; color: var(--fg); }
-
-  p { color: var(--fg-2); margin: 0 0 12px; }
-  strong { color: var(--fg); font-weight: 600; }
-  code { font-family: "SF Mono", Menlo, Monaco, monospace; }
-
-  /* =================  Interactive demo widget  ================= */
-  .demo-frame {
-    background: var(--bg-2);
-    border: 1px solid var(--rule);
-    border-radius: 16px;
-    padding: 0;
-    margin-top: 18px;
-    overflow: hidden;
-    display: grid;
-    grid-template-columns: 1fr;
-  }
-
-  .demo-header {
+  /* ── Header ── */
+  header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: var(--code);
-    border-bottom: 1px solid var(--rule);
-    padding: 12px 18px;
+    padding: 11px 28px;
+    background: var(--bg-header);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
   }
-  .demo-header .label {
-    color: var(--fg-2);
-    font-size: 12px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-  .demo-header .reset {
-    background: transparent;
-    border: 1px solid var(--rule);
-    color: var(--fg-2);
-    padding: 5px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 12px;
-    font-family: inherit;
-  }
-  .demo-header .reset:hover { color: var(--fg); border-color: var(--fg-2); }
-
-  .chat {
-    min-height: 380px;
-    max-height: 560px;
-    overflow-y: auto;
-    padding: 20px 22px;
-    scroll-behavior: smooth;
-  }
-  .chat .empty {
-    color: var(--fg-2);
-    text-align: center;
-    padding: 80px 0 60px;
-    font-size: 14px;
-  }
-  .chat .empty .arrow {
-    display: block;
-    margin-top: 12px;
-    color: var(--green);
-    font-size: 24px;
-    animation: bounce 1.6s ease-in-out infinite;
-  }
-  @keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(6px); }
-  }
-
-  .turn { margin-bottom: 18px; opacity: 0; transform: translateY(6px); animation: appear 0.35s ease-out forwards; }
-  @keyframes appear {
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .turn .speaker {
-    font-size: 11px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    margin-bottom: 6px;
-  }
-  .turn.user .speaker { color: var(--accent); }
-  .turn.claude .speaker { color: var(--green); }
-  .turn .bubble {
-    background: var(--code);
-    border-left: 3px solid var(--rule);
-    padding: 12px 16px;
-    border-radius: 6px;
-    font-size: 14px;
-    line-height: 1.65;
-    color: var(--fg);
-  }
-  .turn.user .bubble { border-left-color: var(--accent); }
-  .turn.claude .bubble { border-left-color: var(--green); }
-  .turn .bubble strong { color: var(--green); }
-  .turn .bubble .warn { color: var(--warning); }
-  .turn .bubble .dim { color: var(--fg-2); font-size: 13px; }
-  .turn .bubble ul { margin: 8px 0 0; padding-left: 20px; }
-  .turn .bubble li { margin: 4px 0; color: var(--fg); }
-  .turn .bubble code {
-    background: rgba(43, 212, 126, 0.08);
-    color: var(--green);
-    padding: 1px 6px;
-    border-radius: 3px;
-    font-size: 12.5px;
-  }
-  .turn .raw-toggle {
-    display: inline-block;
-    margin-top: 8px;
-    font-size: 11px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--fg-2);
-    cursor: pointer;
-    user-select: none;
-  }
-  .turn .raw-toggle:hover { color: var(--green); }
-  .turn .raw-json {
-    display: none;
-    margin-top: 8px;
-    background: var(--code);
-    border: 1px solid var(--rule);
-    border-radius: 4px;
-    padding: 10px 12px;
-    font-family: "SF Mono", Menlo, Monaco, monospace;
-    font-size: 11.5px;
-    color: var(--fg-2);
-    white-space: pre-wrap;
-    word-break: break-all;
-    line-height: 1.5;
-  }
-  .turn .raw-json.open { display: block; }
-
-  .prompt-tray {
-    background: var(--code);
-    border-top: 1px solid var(--rule);
-    padding: 14px 22px 18px;
-  }
-  .prompt-tray .heading {
-    color: var(--fg-2);
-    font-size: 12px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    margin-bottom: 10px;
-  }
-  .prompt-tray .prompts {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-  }
-  @media (max-width: 640px) {
-    .prompt-tray .prompts { grid-template-columns: 1fr; }
-  }
-  .prompt-tray button {
-    text-align: left;
-    background: var(--bg-2);
-    border: 1px solid var(--rule);
-    color: var(--fg);
-    padding: 10px 14px;
+  .logo { display: flex; align-items: center; gap: 14px; }
+  .logo .mark {
+    width: 30px; height: 30px;
+    background: linear-gradient(135deg, var(--green), var(--green-dark));
     border-radius: 8px;
-    cursor: pointer;
-    font-size: 13.5px;
-    font-family: inherit;
-    line-height: 1.4;
-    transition: all 0.15s ease-out;
-    position: relative;
+    color: #fff; display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 16px;
+    box-shadow: 0 1px 3px rgba(46, 138, 46, 0.4);
   }
-  .prompt-tray button:hover {
-    background: rgba(43, 212, 126, 0.06);
-    border-color: var(--green-dim);
-    color: var(--fg);
+  .logo .word {
+    font-weight: 700; font-size: 17px; color: var(--text);
+    letter-spacing: -0.01em;
   }
-  .prompt-tray button.used {
-    opacity: 0.4;
-    text-decoration: line-through;
+  .logo .word .accent { color: var(--green-bright); }
+  .logo-divider { width: 1px; height: 28px; background: #2a2a2a; }
+  .logo-sub {
+    font-size: 11.5px; color: var(--text-muted); letter-spacing: 0.01em;
   }
-  .prompt-tray button.used:hover { opacity: 0.55; }
-  .prompt-tray button .num {
-    color: var(--green);
-    font-weight: 700;
-    margin-right: 8px;
-    font-feature-settings: "tnum";
+  .status-pill {
+    display: flex; align-items: center; gap: 6px;
+    background: #0d1a0d; border: 1px solid #1e3a1e;
+    border-radius: 20px; padding: 5px 14px;
+    font-size: 12px; color: var(--green-bright);
   }
+  .status-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--green-bright); animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
-  /* Feature cards (smaller now, supporting role) */
-  .features {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin-top: 18px;
-  }
-  @media (max-width: 720px) { .features { grid-template-columns: 1fr; } }
-  .feature {
-    background: var(--card);
-    border: 1px solid var(--rule);
-    border-radius: 10px;
-    padding: 18px;
-  }
-  .feature h3 { margin-top: 0; font-size: 15px; }
-  .feature .tag {
-    font-size: 10px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--green);
-    margin-bottom: 6px;
-    display: block;
-  }
-  .feature p { margin: 0; font-size: 13.5px; }
+  /* ── Layout ── */
+  .layout { display: flex; flex: 1; overflow: hidden; }
 
-  /* Install block */
-  pre.code {
-    background: var(--code);
-    border: 1px solid var(--rule);
-    border-radius: 10px;
-    padding: 16px 18px;
-    color: var(--fg);
-    font-family: "SF Mono", Menlo, Monaco, monospace;
-    font-size: 13px;
-    overflow-x: auto;
-    margin: 14px 0;
-  }
-  pre.code .c { color: var(--fg-2); }
-
-  /* CTA block */
-  .cta {
-    background: linear-gradient(135deg, #0a3a23 0%, #052718 100%);
-    border: 1px solid var(--green-dim);
-    border-radius: 14px;
-    padding: 28px;
-    margin-top: 36px;
-  }
-  .cta h2 { color: var(--green); margin-bottom: 8px; }
-  .cta p { color: var(--fg); }
-  .cta .actions {
+  /* ── Sidebar ── */
+  .sidebar {
+    width: 244px;
+    background: var(--bg-sidebar);
+    border-right: 1px solid var(--border);
+    padding: 18px 0 80px;
+    flex-shrink: 0;
     display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin-top: 16px;
+    flex-direction: column;
+    gap: 1px;
+    overflow-y: auto;
   }
-  .cta a.button {
-    display: inline-flex;
-    align-items: center;
-    background: var(--green);
-    color: #052718;
-    text-decoration: none;
-    padding: 11px 22px;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 14.5px;
-    transition: transform 0.1s ease-out;
+  .sidebar-label {
+    font-size: 10px; font-weight: 700; color: #3a3a3a;
+    letter-spacing: 0.10em; text-transform: uppercase;
+    padding: 0 16px 8px;
   }
-  .cta a.button.secondary {
-    background: transparent;
-    color: var(--green);
-    border: 1px solid var(--green-dim);
+  .sidebar-section {
+    font-size: 10px; font-weight: 700; color: #2a3a2a;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 12px 16px 5px;
+    border-top: 1px solid #1a1a1a;
+    margin-top: 6px;
   }
-  .cta a.button:hover { transform: translateY(-1px); }
+  .step-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 16px; cursor: pointer;
+    border-left: 3px solid transparent;
+    font-size: 12.5px; color: #585858;
+    transition: background 0.15s, color 0.15s;
+  }
+  .step-item:hover { background: #111811; color: #b0d8b0; }
+  .step-item.active {
+    background: #111811;
+    border-left-color: var(--green);
+    color: #d0e8d0;
+  }
+  .step-item.done    { color: #3a5a3a; }
+  .step-item.done .step-num { background: #0d1f0d; color: var(--green-bright); }
+  .step-num {
+    width: 20px; height: 20px; border-radius: 50%;
+    background: #1a1a1a; font-size: 11px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; color: #4a4a4a;
+  }
+  .step-item.active .step-num { background: var(--green); color: #fff; }
 
-  footer {
-    margin-top: 56px;
-    padding-top: 22px;
-    border-top: 1px solid var(--rule);
-    color: var(--fg-2);
-    font-size: 13px;
+  /* ── Chat ── */
+  .chat-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .messages {
+    flex: 1; overflow-y: auto; padding: 28px 0 18px; scroll-behavior: smooth;
   }
-  a { color: var(--accent); text-decoration: none; }
-  a:hover { text-decoration: underline; }
+  .messages::-webkit-scrollbar { width: 4px; }
+  .messages::-webkit-scrollbar-thumb { background: #2a3a2a; border-radius: 4px; }
+
+  /* Welcome screen */
+  .welcome {
+    max-width: 600px; margin: 60px auto 0; padding: 0 28px;
+    text-align: center; color: var(--text-muted);
+  }
+  .welcome h1 {
+    font-size: 24px; color: var(--text); margin-bottom: 8px;
+    letter-spacing: -0.01em; font-weight: 700;
+  }
+  .welcome p { font-size: 14.5px; line-height: 1.6; margin-bottom: 24px; }
+  .welcome p strong { color: var(--green-bright); font-weight: 600; }
+  .welcome .hint {
+    background: #0d1a0d; border: 1px solid #1e3a1e;
+    border-radius: 8px; padding: 14px 18px;
+    font-size: 13px; color: #6dcf6d;
+    display: inline-block; text-align: left;
+  }
+  .welcome .hint kbd {
+    background: #1a2a1a; border: 1px solid #2a4a2a;
+    border-radius: 3px; padding: 2px 7px;
+    font-family: 'SF Mono', monospace; font-size: 11px;
+    color: var(--green-bright); margin: 0 2px;
+  }
+
+  .msg-row {
+    display: flex; gap: 14px;
+    padding: 5px 28px;
+    max-width: 880px; margin: 0 auto; width: 100%;
+    opacity: 0; transform: translateY(8px);
+    animation: fadeUp 0.3s ease forwards;
+  }
+  @keyframes fadeUp { to { opacity:1; transform:translateY(0); } }
+  .msg-row.user { justify-content: flex-end; }
+
+  .avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    flex-shrink: 0; display: flex; align-items: center;
+    justify-content: center; font-size: 13px; font-weight: 700; margin-top: 2px;
+  }
+  .avatar.claude {
+    background: linear-gradient(135deg, var(--green), var(--green-dark));
+    color: #fff;
+  }
+  .avatar.user { background: #1e1e1e; color: #5a5a5a; border: 1px solid #2a2a2a; }
+
+  .bubble {
+    max-width: 660px; padding: 11px 15px;
+    border-radius: 12px; font-size: 13.5px; line-height: 1.6;
+  }
+  .bubble.claude {
+    background: var(--bg-card); border: 1px solid #242424;
+    color: #d8d8d8; border-radius: 4px 12px 12px 12px;
+  }
+  .bubble.user {
+    background: var(--bg-input); border: 1px solid var(--border-g);
+    color: #c8dcc8; border-radius: 12px 4px 12px 12px;
+  }
+
+  .tool-call {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #141814; border: 1px solid #1e2a1e;
+    border-radius: 6px; padding: 3px 10px;
+    font-size: 11px; color: #4a6a4a; margin-bottom: 8px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+  }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 10px; border-radius: 12px;
+    font-size: 12px; font-weight: 600; margin-bottom: 7px;
+  }
+  .badge.warn { background:#1e1600; color:#f59e0b; border:1px solid #3a2800; }
+  .badge.hold { background:#1e1200; color:#fb923c; border:1px solid #3a2000; }
+  .badge.ok   { background:#0a180a; color:var(--green-bright); border:1px solid #1a3a1a; }
+  .badge.info { background:#101810; color:#6dcf6d; border:1px solid #1a3a1a; }
+  .badge.new  { background:#0a180a; color:#86efac; border:1px solid #1e4a1e; }
+  .badge.ams  { background:#1a1000; color:#fbbf24; border:1px solid #3a2800; }
+  .badge.hs   { background:#001818; color:#2dd4bf; border:1px solid #003232; }
+  .badge.hub  { background:#1a0e08; color:#ff8a4c; border:1px solid #3a1d10; }
+
+  .demo-table { width:100%; border-collapse:collapse; font-size:13px; margin-top:8px; }
+  .demo-table th {
+    text-align:left; color:#4a4a4a; font-weight:500;
+    padding:4px 10px 4px 0; border-bottom:1px solid #1e1e1e;
+    font-size:11px; text-transform:uppercase; letter-spacing:0.06em;
+  }
+  .demo-table td { padding:6px 10px 6px 0; border-bottom:1px solid #191919; color:#cccccc; }
+  .mono { font-family:'SF Mono','Fira Code',monospace; font-size:12px; color:#6dcf6d; }
+  .amt      { font-weight:600; color:var(--green-bright); }
+  .amt-warn { font-weight:600; color:#f59e0b; }
+  .urgent   { font-weight:600; color:#f87171; }
+  .chip {
+    display:inline-block; background:#181818; border:1px solid #282828;
+    border-radius:4px; padding:1px 6px; font-size:11px; color:#5a7a5a;
+    font-family:'SF Mono','Fira Code',monospace;
+  }
+  .chip.red  { background:#1e0a0a; border-color:#4a1818; color:#f87171; }
+  .chip.gold { background:#1e1400; border-color:#4a3200; color:#fbbf24; }
+  .chip.teal { background:#00181a; border-color:#003638; color:#2dd4bf; }
+  .chip.hub  { background:#1a0e08; border-color:#4a2818; color:#ff9c66; }
+
+  .suggestions { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .suggestions .pill {
+    background: #141814; border: 1px solid #1e2a1e;
+    border-radius: 6px; padding: 5px 11px;
+    font-size: 12px; color: #b0d8b0;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .suggestions .pill:hover {
+    background: #1a2a1a; border-color: #2a4a2a;
+    color: var(--green-bright);
+  }
+
+  /* ── Bottom bar ── */
+  .bottom-bar {
+    border-top:1px solid var(--border);
+    background:var(--bg-header);
+    flex-shrink:0;
+  }
+  .bar-row {
+    padding: 12px 28px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .bar-row.input-row { border-top: 1px solid #1a1a1a; padding-top: 10px; padding-bottom: 14px; }
+
+  .input-wrap {
+    flex: 1; position: relative;
+  }
+  .input-wrap input {
+    width: 100%;
+    background: #0d120d; border: 1px solid #1e2a1e;
+    border-radius: 10px; padding: 11px 110px 11px 16px;
+    color: var(--text); font-size: 14px;
+    font-family: inherit;
+    transition: border-color 0.15s;
+  }
+  .input-wrap input::placeholder { color: #3a3a3a; }
+  .input-wrap input:focus {
+    outline: none; border-color: var(--green);
+    background: #101610;
+  }
+  .input-wrap .send-icon {
+    position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+    background: var(--green); color: #fff;
+    border: none; border-radius: 7px;
+    padding: 7px 14px; font-size: 12.5px;
+    font-weight: 600; cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+    font-family: inherit;
+  }
+  .input-wrap .send-icon:hover { opacity: 0.9; transform: translateY(-50%) scale(1.02); }
+  .input-wrap .send-icon:disabled { opacity: 0.3; cursor: default; }
+
+  .prompt-preview {
+    font-size:13px; color:#404040; font-style:italic; flex:1; margin-right:8px;
+  }
+  .prompt-preview span { color:#5a7a5a; }
+  .prompt-preview .note {
+    color: #3a5a3a; font-style: normal; font-size: 11px;
+    letter-spacing: 0.08em; text-transform: uppercase; margin-right: 8px;
+  }
+  .btn-next {
+    background: linear-gradient(135deg, var(--green), var(--green-dark));
+    color:#fff; border:none; border-radius:8px;
+    padding:9px 20px; font-size:13.5px; font-weight:700;
+    cursor:pointer; display:flex; align-items:center; gap:6px;
+    transition:opacity 0.15s,transform 0.1s; white-space:nowrap;
+    letter-spacing: 0.01em; font-family: inherit;
+  }
+  .btn-next:hover  { opacity:0.88; transform:translateY(-1px); }
+  .btn-next:active { transform:translateY(0); }
+  .btn-next:disabled { opacity:0.3; cursor:default; transform:none; }
+  .btn-restart {
+    background:#1a1a1a; color:#5a5a5a;
+    border:1px solid #2a2a2a; border-radius:8px;
+    padding:8px 14px; font-size:12.5px; cursor:pointer;
+    transition:background 0.15s, color 0.15s;
+    font-family: inherit;
+  }
+  .btn-restart:hover { background:#222222; color:#7a7a7a; }
+  .counter {
+    font-size:11.5px; color:#2e3e2e;
+    font-family: 'SF Mono', monospace;
+    padding: 4px 9px; background: #0d120d; border-radius: 4px;
+    border: 1px solid #1a2a1a;
+  }
+  .install-link {
+    font-size: 12px; color: #5a7a5a;
+    text-decoration: none;
+    padding: 5px 0; white-space: nowrap;
+  }
+  .install-link:hover { color: var(--green-bright); }
+
+  /* Mobile responsive */
+  @media (max-width: 720px) {
+    .sidebar { display: none; }
+    .bar-row { padding: 10px 16px; flex-wrap: wrap; }
+    .prompt-preview { display: none; }
+    .input-wrap input { padding-right: 90px; }
+    .msg-row { padding: 4px 16px; }
+    .welcome { margin-top: 30px; padding: 0 16px; }
+  }
 </style>
 </head>
 <body>
-<div class="wrap">
 
-  <header class="hero">
-    <span class="badge">SnapRefund · AgentSnap MCP · v1.0</span>
-    <h1>The AI operations layer for agencies on HubSpot.</h1>
-    <p class="lede">
-      A working MCP server you install in Claude Desktop. Renewals, invoices, claims, commissions — done inside the chat interface your team already uses, with HubSpot as the system of record. Five-minute install, fully working with mock data, optional one-line switch to your live HubSpot.
-    </p>
-    <p class="callout">↓ Try the demo below — every response is real output from the MCP server, not a video.</p>
-  </header>
+<header>
+  <div class="logo">
+    <div class="mark">A</div>
+    <div class="word">Agent<span class="accent">Snap</span></div>
+    <div class="logo-divider"></div>
+    <div class="logo-sub">MCP Server · HubSpot · AMS 360 · HawkSoft · SnapRefund</div>
+  </div>
+  <div class="status-pill">
+    <div class="status-dot"></div>
+    Mock demo · ready for live HubSpot
+  </div>
+</header>
 
-  <!-- ============================================== -->
-  <!--           INTERACTIVE DEMO WIDGET              -->
-  <!-- ============================================== -->
-  <section id="demo">
-    <h2>Try the demo</h2>
-    <p>Pick a prompt. You'll see what Claude says back, with real tool output from the MCP server. Go in order for the narrative, or jump around.</p>
+<div class="layout">
+  <div class="sidebar" id="sidebar"></div>
 
-    <div class="demo-frame">
-      <div class="demo-header">
-        <span class="label">Claude Desktop · AgentSnap HubSpot Demo (mock)</span>
-        <button class="reset" id="reset-btn">Reset</button>
-      </div>
-
-      <div class="chat" id="chat">
-        <div class="empty" id="empty-state">
-          Click a prompt below to start.
-          <span class="arrow">↓</span>
+  <div class="chat-area">
+    <div class="messages" id="messages">
+      <div class="welcome" id="welcome">
+        <h1>Try the AgentSnap demo</h1>
+        <p>Every response below is real output from the MCP server.<br>
+          <strong>Click "Send Next"</strong> to walk the workflow, <strong>jump</strong> to any step on the left, or <strong>type your own question</strong> at the bottom.</p>
+        <div class="hint">
+          Try: <kbd>What's on my plate today?</kbd> &nbsp;·&nbsp; <kbd>Find cross-sell opportunities</kbd> &nbsp;·&nbsp; <kbd>Best carrier this year?</kbd>
         </div>
       </div>
-
-      <div class="prompt-tray">
-        <div class="heading">Prompts</div>
-        <div class="prompts" id="prompts"></div>
-      </div>
     </div>
-  </section>
 
-  <!-- ============================================== -->
-  <!--           SUPPORTING FEATURE CARDS             -->
-  <!-- ============================================== -->
-  <section>
-    <h2>What you actually get</h2>
-    <div class="features">
-      <div class="feature">
-        <span class="tag">Operations, not quoting</span>
-        <h3>9 tools wired to the daily work</h3>
-        <p>Daily briefing, renewal pipeline, customer lookup, invoice creation, claim opening, commission summary.</p>
+    <div class="bottom-bar">
+      <div class="bar-row">
+        <div class="prompt-preview" id="next-preview">
+          <span class="note">Next ▸</span>
+          <span id="next-text">"What's on my plate today?"</span>
+        </div>
+        <span class="counter" id="counter">1 / 18</span>
+        <button class="btn-restart" onclick="restart()">↺ Restart</button>
+        <button class="btn-next" id="btn-next" onclick="advance()">Send Next ›</button>
       </div>
-      <div class="feature">
-        <span class="tag">HubSpot as the AMS</span>
-        <h3>Two-way sync, no AMS required</h3>
-        <p>Invoices become HubSpot deals. Claims and renewals log as timeline notes on the contact.</p>
+      <div class="bar-row input-row">
+        <div class="input-wrap">
+          <input
+            type="text"
+            id="custom-input"
+            placeholder="Or type your own question — e.g., 'show me my best carrier' or 'who's overdue?'"
+            autocomplete="off"
+          />
+          <button class="send-icon" id="custom-send">Send ↵</button>
+        </div>
+        <a href="https://github.com/aisoundz/agentsnap-hubspot-demo" class="install-link" target="_blank">View source ↗</a>
       </div>
-      <div class="feature">
-        <span class="tag">Built for safety</span>
-        <h3>Spend caps + audit log</h3>
-        <p>Per-transaction $5K limit with confirmation prompt. $20K daily cap. Every action logged to a JSONL audit file.</p>
-      </div>
-      <div class="feature">
-        <span class="tag">No vendor lock-in</span>
-        <h3>Runs locally on your Mac or PC</h3>
-        <p>Plain Python over stdio. Your HubSpot token never leaves your machine. Fork, modify, or wire into your internal stack.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============================================== -->
-  <!--           INSTALL                              -->
-  <!-- ============================================== -->
-  <section>
-    <h2>Ready to try it with YOUR HubSpot? Install in 5 minutes.</h2>
-    <pre class="code"><span class="c"># 1. Download &amp; unzip</span>
-curl -L -o agentsnap-hubspot-demo.zip \
-  https://github.com/aisoundz/agentsnap-hubspot-demo/releases/download/v1.0/agentsnap-hubspot-demo.zip
-unzip agentsnap-hubspot-demo.zip
-cd agentsnap-hubspot-demo
-
-<span class="c"># 2. Python environment</span>
-python3 -m venv .venv &amp;&amp; source .venv/bin/activate
-pip install -r requirements.txt
-
-<span class="c"># 3. Verify</span>
-python -c "import server; print('OK')"
-
-<span class="c"># 4. Wire into Claude Desktop &mdash; see INSTALL.md</span>
-<span class="c">#    Restart Claude. Ask: &quot;What's on my plate today?&quot;</span></pre>
-  </section>
-
-  <!-- ============================================== -->
-  <!--           CTA                                  -->
-  <!-- ============================================== -->
-  <div class="cta">
-    <h2>Take it for a real run</h2>
-    <p>The demo above is the experience you'll have in Claude Desktop — same responses, same flow. The only difference: when you install it locally, you can point it at <strong>your own HubSpot</strong> and create real deals and timeline notes on your real contacts.</p>
-    <div class="actions">
-      <a class="button" href="https://github.com/aisoundz/agentsnap-hubspot-demo/releases/download/v1.0/agentsnap-hubspot-demo.zip">Download v1.0 zip</a>
-      <a class="button secondary" href="https://github.com/aisoundz/agentsnap-hubspot-demo">View source on GitHub</a>
     </div>
   </div>
-
-  <footer>
-    Built by Anis Taylor and the SnapRefund team. AgentSnap MCP &middot; v1.0 &middot; May 2026.<br>
-    Questions? <a href="mailto:anis.taylor@snaprefund.net">anis.taylor@snaprefund.net</a>
-  </footer>
-
 </div>
 
-<!-- ============================================== -->
-<!--           DEMO DATA + LOGIC                    -->
-<!-- ============================================== -->
 <script>
-// Each prompt: the user-facing label, the Claude response (HTML-formatted),
-// and the raw JSON pulled directly from the e2e_test.py output against the
-// real MCP server. The raw JSON proves these aren't made up.
+// ============================================================================
+//   STEPS — 13 sequential workflow + 5 custom queries (18 total)
+// ============================================================================
 
-const PROMPTS = [
+const STEPS = [
+  // ── 1. Daily Briefing ──
   {
-    id: 1,
-    user: "What's on my plate today?",
-    claude: `You've got <strong>4 urgent renewals</strong> in the next 14 days, <strong>1 overdue invoice</strong> ($2,210 with Mike Chen at Progressive), and <strong>3 open claims</strong>. YTD commission so far: <strong>$4,698.15</strong> across all four carriers.<br><br>
-The most urgent renewal is <strong>Robert Martinez</strong> — Hartford bundle, $7,820 premium, expires in 5 days. Want me to start that renewal?`,
-    raw: {
-      "mode": "mock",
-      "urgent_renewals_count": 4,
-      "urgent_renewals": [
-        {"contact_id": "hs_1006", "name": "Robert Martinez", "carrier": "Hartford", "policy_type": "Bundle", "premium": 7820.0, "expires_in_days": 5, "policy_number": "HF-BUND-99001"},
-        {"contact_id": "hs_1002", "name": "Mike Chen", "carrier": "Progressive", "policy_type": "Bundle", "premium": 2210.0, "expires_in_days": 0, "policy_number": "PG-BUND-88123"},
-        {"contact_id": "hs_1010", "name": "James Anderson", "carrier": "Nationwide", "policy_type": "Bundle", "premium": 3210.0, "expires_in_days": 2, "policy_number": "NW-BUND-31221"},
-        {"contact_id": "hs_1001", "name": "Sarah Johnson", "carrier": "Hartford", "policy_type": "Auto", "premium": 1480.0, "expires_in_days": 13, "policy_number": "HF-AUTO-23491"}
-      ],
-      "overdue_invoices_count": 1,
-      "open_claims_count": 3,
-      "commission_ytd": 4698.15,
-      "spend_today": 0.0,
-      "spend_remaining_today": 20000.0,
-      "next_action": "Summarize the most urgent items for the user..."
-    }
+    nav: 0,
+    label: "Daily briefing",
+    user: "What do I have on my plate today?",
+    tool: "agentsnap_get_daily_briefing",
+    keywords: ["plate", "today", "morning", "briefing", "what's on", "priorities", "overview"],
+    response: `<div class="badge warn">⚠ Morning Briefing — May 20, 2026</div>
+<p style="font-size:12px;color:#555555;margin-bottom:10px;">Priority action items:</p>
+<table class="demo-table">
+  <tr><th>Priority</th><th>Item</th></tr>
+  <tr><td><span class="chip red">URGENT</span></td><td>Mike Chen — Progressive Bundle expires <strong class="urgent">today</strong> ($2,210 premium)</td></tr>
+  <tr><td><span class="chip red">URGENT</span></td><td>Robert Martinez — Hartford Bundle expires in <strong class="urgent">5 days</strong> ($7,820)</td></tr>
+  <tr><td><span class="chip gold">SOON</span></td><td>Sarah Johnson — Hartford Auto expires in 13 days ($1,480)</td></tr>
+  <tr><td><span class="chip">Overdue</span></td><td>1 invoice · <span class="amt-warn">$2,210.00</span> outstanding (Mike Chen)</td></tr>
+  <tr><td><span class="chip">Claims</span></td><td>3 open · 1 under review · 1 investigating</td></tr>
+  <tr><td><span class="chip">Commission</span></td><td><span class="amt">$4,698.15</span> YTD across all four carriers</td></tr>
+</table>
+<p style="margin-top:10px;color:#888888;font-size:13px;">Want me to pull up the full renewal pipeline, or start the most urgent renewal?</p>`
   },
+
+  // ── 2. Renewal Pipeline ──
   {
-    id: 2,
-    user: "Show me everyone whose policy expires in the next 30 days.",
-    claude: `Here are the <strong>5 policies</strong> expiring in the next 30 days, urgent first:
-<ul>
-  <li><strong>Mike Chen</strong> · Progressive Bundle · $2,210 · <span class="warn">expires today</span></li>
-  <li><strong>James Anderson</strong> · Nationwide Bundle · $3,210 · expires in 2 days</li>
-  <li><strong>Robert Martinez</strong> · Hartford Bundle · $7,820 · expires in 5 days</li>
-  <li><strong>Sarah Johnson</strong> · Hartford Auto · $1,480 · expires in 13 days</li>
-  <li><strong>Tom Wright</strong> · Hartford Auto · $1,140 · expires in 21 days</li>
-</ul>
-<span class="dim">Total Q2 renewal volume in this window: $15,860.</span> Want to start with Mike (he's already at the expiration line)?`,
-    raw: {
-      "window_days": 30,
-      "total": 5,
-      "items": [
-        {"contact_id": "hs_1002", "name": "Mike Chen", "carrier": "Progressive", "policy_type": "Bundle", "premium": 2210.0, "expires_in_days": 0, "urgency": "urgent"},
-        {"contact_id": "hs_1010", "name": "James Anderson", "carrier": "Nationwide", "policy_type": "Bundle", "premium": 3210.0, "expires_in_days": 2, "urgency": "urgent"},
-        {"contact_id": "hs_1006", "name": "Robert Martinez", "carrier": "Hartford", "policy_type": "Bundle", "premium": 7820.0, "expires_in_days": 5, "urgency": "urgent"},
-        {"contact_id": "hs_1001", "name": "Sarah Johnson", "carrier": "Hartford", "policy_type": "Auto", "premium": 1480.0, "expires_in_days": 13, "urgency": "urgent"},
-        {"contact_id": "hs_1004", "name": "Tom Wright", "carrier": "Hartford", "policy_type": "Auto", "premium": 1140.0, "expires_in_days": 21, "urgency": "soon"}
-      ]
-    }
+    nav: 1,
+    label: "Renewal pipeline",
+    user: "Show me the full renewal pipeline for the next 90 days.",
+    tool: "agentsnap_get_renewal_pipeline",
+    keywords: ["renewal", "pipeline", "expir", "renewing", "renewals", "due"],
+    response: `<div class="badge info">8 renewals due in next 90 days · $19,150 current premium</div>
+<table class="demo-table">
+  <tr><th>Policyholder</th><th>Carrier</th><th>Premium</th><th>Expires</th><th>Urgency</th></tr>
+  <tr><td>Mike Chen</td><td>Progressive</td><td class="amt">$2,210.00</td><td>today</td><td><span class="chip red">urgent</span></td></tr>
+  <tr><td>James Anderson</td><td>Nationwide</td><td class="amt">$3,210.00</td><td>2 days</td><td><span class="chip red">urgent</span></td></tr>
+  <tr><td>Robert Martinez</td><td>Hartford</td><td class="amt">$7,820.00</td><td>5 days</td><td><span class="chip red">urgent</span></td></tr>
+  <tr><td>Sarah Johnson</td><td>Hartford</td><td class="amt">$1,480.00</td><td>13 days</td><td><span class="chip red">urgent</span></td></tr>
+  <tr><td>Tom Wright</td><td>Hartford</td><td class="amt">$1,140.00</td><td>21 days</td><td><span class="chip gold">soon</span></td></tr>
+  <tr><td>Lisa Patel</td><td>Allstate</td><td class="amt">$1,920.00</td><td>35 days</td><td><span class="chip">upcoming</span></td></tr>
+  <tr><td>Amy Davis</td><td>Nationwide</td><td class="amt">$1,675.00</td><td>55 days</td><td><span class="chip">upcoming</span></td></tr>
+  <tr><td>Jennifer Lee</td><td>Progressive</td><td class="amt">$980.00</td><td>65 days</td><td><span class="chip">upcoming</span></td></tr>
+</table>
+<p style="margin-top:10px;color:#888888;font-size:13px;">Ready to start Sarah Johnson's renewal? Her policy is the cleanest small one — good warm-up before the bigger ones.</p>`
   },
+
+  // ── 3. Create Invoice ──
   {
-    id: 3,
-    user: "Look up Robert Martinez.",
-    claude: `<strong>Robert Martinez</strong> — Toledo, OH · robert.martinez@example.com · +1-555-0106<br><br>
-<strong>Current policy:</strong> Hartford Bundle · <code>HF-BUND-99001</code> · $7,820 annual premium · effective May 25, 2025 · expires <strong>May 25, 2026 (5 days)</strong><br>
-<strong>Claim history:</strong> none open<br>
-<strong>Past invoices:</strong> 2 paid this year (renewal + umbrella add-on, total $9,200)<br><br>
-Want me to start the renewal? Heads-up: the premium is above the $5K per-transaction safety limit, so I'll ask you to confirm before creating the invoice.`,
-    raw: {
-      "contact_id": "hs_1006",
-      "name": "Robert Martinez",
-      "email": "robert.martinez@example.com",
-      "phone": "+1-555-0106",
-      "city": "Toledo",
-      "state": "OH",
-      "policy": {
-        "type": "Bundle",
-        "carrier": "Hartford",
-        "carrier_commission_rate": 0.12,
-        "policy_number": "HF-BUND-99001",
-        "premium": 7820.0,
-        "effective_date": "2025-05-25",
-        "expiration_date": "2026-05-25"
-      },
-      "invoices": [
-        {"id": 5010, "status": "paid", "gross_premium": 6800.0},
-        {"id": 5017, "status": "paid", "gross_premium": 2400.0}
-      ],
-      "claims": []
-    }
+    nav: 2,
+    label: "Renew Sarah",
+    user: "Let's renew Sarah Johnson at Hartford — same premium $1,480. Policy HF-AUTO-23491.",
+    tool: "agentsnap_create_renewal_invoice",
+    keywords: ["renew sarah", "sarah johnson", "create invoice sarah", "renew her"],
+    response: `<div class="badge ok">✓ Renewal invoice created — synced to HubSpot</div>
+<table class="demo-table">
+  <tr><th>Field</th><th>Value</th></tr>
+  <tr><td>AgentSnap Invoice ID</td><td class="chip">5022</td></tr>
+  <tr><td>Policyholder</td><td>Sarah Johnson</td></tr>
+  <tr><td>Carrier</td><td>Hartford Insurance</td></tr>
+  <tr><td>Gross Premium</td><td class="amt">$1,480.00</td></tr>
+  <tr><td>Commission (12%)</td><td class="amt">$177.60</td></tr>
+  <tr><td>Policy</td><td class="mono">HF-AUTO-23491</td></tr>
+  <tr><td>Term</td><td>2026-05-20 → 2027-05-20</td></tr>
+  <tr><td>Status</td><td><span class="chip">payment_link_pending</span></td></tr>
+</table>
+<p style="font-size:12px;color:#5a5a5a;margin-top:10px;">HubSpot side-effects:</p>
+<table class="demo-table">
+  <tr><td>HubSpot Deal</td><td><span class="chip hub">deal_1716224130123</span> · associated with Sarah's contact</td></tr>
+  <tr><td>Timeline Note</td><td style="color:#888;">"AgentSnap created renewal invoice $1,480.00 with Hartford..."</td></tr>
+</table>
+<p style="margin-top:10px;color:#888888;font-size:13px;">Audit log entry written. Send payment link to Sarah, or move to the next renewal?</p>`
   },
+
+  // ── 4. Duplicate Catch ──
   {
-    id: 4,
-    user: "Renew Sarah Johnson's policy.",
-    claude: `Done. Created invoice <code>#5022</code> for $1,480 with Hartford (policy <code>HF-AUTO-23491</code>).<br><br>
-<strong>Synced to HubSpot:</strong>
-<ul>
-  <li>Deal <code>deal_1716224130123</code> created and associated with Sarah's contact record</li>
-  <li>Timeline note logged on the contact: <em>"AgentSnap created renewal invoice $1,480.00 with Hartford..."</em></li>
-</ul>
-<span class="dim">Daily spend so far: $1,480 / $20,000 limit.</span> Want me to send Sarah the payment link, or move to the next renewal?`,
-    raw: {
-      "status": "created",
-      "invoice": {"id": 5022, "contact_id": "hs_1001", "carrier_id": 1, "policy_number": "HF-AUTO-23491", "gross_premium": 1480.0, "status": "payment_link_pending", "effective_date": "2026-05-20"},
-      "hubspot_deal_id": "deal_1716224130123",
-      "hubspot_timeline_note": "logged"
-    }
+    nav: 3,
+    label: "Duplicate catch",
+    user: "Now invoice Mike Chen at Progressive — $1,800, policy PG-BUND-88123.",
+    tool: "agentsnap_create_renewal_invoice",
+    keywords: ["mike chen invoice", "duplicate", "another invoice mike", "invoice mike"],
+    response: `<div class="badge warn">⚠ Duplicate detected — overdue invoice already on file</div>
+<p>Mike Chen already has an open Progressive invoice. Creating a second one would create accounting noise.</p>
+<table class="demo-table" style="margin-top:10px;">
+  <tr><th>Invoice ID</th><th>Premium</th><th>Status</th><th>Days overdue</th></tr>
+  <tr><td class="chip">5003</td><td class="amt-warn">$2,210.00</td><td><span class="chip">overdue</span></td><td>25</td></tr>
+</table>
+<p style="margin-top:10px;color:#888888;font-size:13px;">Options: (1) send a payment reminder on the existing invoice, (2) cancel #5003 and reissue at $1,800, or (3) create the new one anyway and reconcile later. What do you want to do?</p>`
   },
+
+  // ── 5. Spend Cap ──
   {
-    id: 5,
-    user: "Renew Robert Martinez's Hartford policy.",
-    claude: `<span class="warn">⏸ Spend cap triggered.</span><br><br>
-This renewal is <strong>$7,820</strong>, above the $5,000 per-transaction safety limit.<br><br>
-<strong>Preview:</strong>
-<ul>
-  <li>Contact: Robert Martinez</li>
-  <li>Carrier: Hartford</li>
-  <li>Policy: <code>HF-BUND-99001</code></li>
-  <li>Gross premium: $7,820.00</li>
-</ul>
-<strong>Should I proceed?</strong> If yes, I'll create the invoice in AgentSnap, log it as a deal in HubSpot, and add a timeline note. Reply "yes" to confirm.`,
-    raw: {
-      "status": "awaiting_confirmation",
-      "confirmation_id": "conf_a3f8e215c92b",
-      "amount": 7820.0,
-      "per_transaction_limit": 5000.0,
-      "preview": {"contact": "Robert Martinez", "carrier": "Hartford", "policy_number": "HF-BUND-99001", "gross_premium": 7820.0},
-      "message": "This action is for $7,820.00, which is above the per-transaction safety limit of $5,000.00..."
-    }
+    nav: 4,
+    label: "Spend cap hold",
+    user: "OK skip that — renew Robert Martinez's Hartford bundle, $7,820, policy HF-BUND-99001.",
+    tool: "agentsnap_create_renewal_invoice",
+    keywords: ["robert martinez", "spend cap", "big invoice", "$7,820", "renew robert", "hartford bundle"],
+    response: `<div class="badge hold">🔒 Spend cap — human confirmation required</div>
+<p>This renewal is <strong>$7,820</strong>, above the $5,000 per-transaction safety limit.</p>
+<table class="demo-table" style="margin-top:10px;">
+  <tr><th>Field</th><th>Value</th></tr>
+  <tr><td>Policyholder</td><td>Robert Martinez</td></tr>
+  <tr><td>Carrier</td><td>Hartford Insurance</td></tr>
+  <tr><td>Gross Premium</td><td class="amt-warn">$7,820.00</td></tr>
+  <tr><td>Est. Commission (12%)</td><td class="amt">$938.40</td></tr>
+  <tr><td>Policy</td><td class="mono">HF-BUND-99001</td></tr>
+  <tr><td>Confirmation ID</td><td class="mono">conf_a3f8e215c92b</td></tr>
+</table>
+<p style="margin-top:10px;color:#888888;font-size:13px;">Daily cap remaining: <span class="amt">$18,520 / $20,000</span>. Reply "yes" to confirm and I'll create the invoice + log to HubSpot.</p>`
   },
+
+  // ── 6. Confirmation ──
   {
-    id: 6,
-    user: "Yes, confirm.",
-    claude: `Confirmed. Created invoice <code>#5023</code> for $7,820.<br><br>
-<strong>Synced to HubSpot:</strong>
-<ul>
-  <li>Deal <code>deal_1716224187654</code> created &amp; associated with Robert's record</li>
-  <li>Timeline note logged: <em>"AgentSnap created renewal invoice $7,820.00 with Hartford..."</em></li>
-</ul>
-<span class="dim">Daily spend so far: $9,300 / $20,000 limit. Audit log entry written.</span><br><br>
-Want to send the payment link, or move to the next renewal in the pipeline?`,
-    raw: {
-      "status": "confirmed",
-      "result": {
-        "invoice": {"id": 5023, "contact_id": "hs_1006", "gross_premium": 7820.0, "status": "payment_link_pending"},
-        "hubspot_deal": {"id": "deal_1716224187654", "associated_contact_id": "hs_1006"}
-      },
-      "next_action": "Tell the user the action completed..."
-    }
+    nav: 5,
+    label: "Confirm",
+    user: "Yes, go ahead and confirm it.",
+    tool: "agentsnap_confirm_action",
+    keywords: ["yes confirm", "confirm action", "go ahead", "approve it", "do it", "yes go"],
+    response: `<div class="badge ok">✓ Confirmed — invoice created and synced</div>
+<table class="demo-table" style="margin-top:8px;">
+  <tr><th>Field</th><th>Value</th></tr>
+  <tr><td>AgentSnap Invoice ID</td><td class="chip">5023</td></tr>
+  <tr><td>Policyholder</td><td>Robert Martinez</td></tr>
+  <tr><td>Carrier</td><td>Hartford Insurance</td></tr>
+  <tr><td>Gross Premium</td><td class="amt">$7,820.00</td></tr>
+  <tr><td>Commission (12%)</td><td class="amt">$938.40</td></tr>
+  <tr><td>HubSpot Deal</td><td><span class="chip hub">deal_1716224187654</span></td></tr>
+  <tr><td>Audit Trail</td><td style="color:#888;">confirmation_executed · 2026-05-20T14:23</td></tr>
+</table>
+<p style="margin-top:10px;color:#888888;font-size:13px;">Daily spend so far: $9,300 / $20,000. Send payment link to Robert, or move on?</p>`
   },
+
+  // ── 7. Open Claim ──
   {
-    id: 7,
-    user: "Open a property claim for Mike Chen — water damage to the basement.",
-    claude: `Done. Opened claim <code>CL-2026-0005</code>:<br><br>
-<ul>
-  <li>Type: <strong>property</strong></li>
-  <li>Carrier: Progressive (policy <code>PG-BUND-88123</code>)</li>
-  <li>Description: <em>Water damage to the basement, suspected slow leak.</em></li>
-  <li>Status: open</li>
-</ul>
-<strong>Synced to HubSpot:</strong> timeline note added on Mike's contact — <em>"AgentSnap opened property claim CL-2026-0005 with Progressive..."</em><br><br>
-Want me to draft a notification to Mike, or pull up all your open claims to triage?`,
-    raw: {
-      "status": "created",
-      "claim": {
-        "id": "CL-2026-0005",
-        "contact_id": "hs_1002",
-        "carrier_id": 2,
-        "policy_number": "PG-BUND-88123",
-        "claim_type": "property",
-        "status": "open",
-        "description": "Water damage to the basement, suspected slow leak.",
-        "opened_date": "2026-05-20"
-      },
-      "hubspot_timeline_note": "logged"
-    }
+    nav: 6,
+    label: "Open claim",
+    user: "Mike Chen just called — water damage in his basement, suspected slow leak. File a claim with Progressive on PG-BUND-88123.",
+    tool: "agentsnap_create_claim",
+    keywords: ["open claim", "file a claim", "water damage", "new claim", "mike chen claim", "fnol"],
+    response: `<div class="badge new">📋 Claim opened — status: open</div>
+<table class="demo-table" style="margin-top:8px;">
+  <tr><th>Field</th><th>Value</th></tr>
+  <tr><td>Claim ID</td><td class="chip">CL-2026-0005</td></tr>
+  <tr><td>Policyholder</td><td>Mike Chen</td></tr>
+  <tr><td>Carrier</td><td>Progressive</td></tr>
+  <tr><td>Policy</td><td class="mono">PG-BUND-88123</td></tr>
+  <tr><td>Type</td><td>Property</td></tr>
+  <tr><td>Description</td><td style="color:#aaa;">Water damage to basement, suspected slow leak</td></tr>
+  <tr><td>Opened</td><td>2026-05-20</td></tr>
+  <tr><td>Status</td><td><span class="chip">open</span></td></tr>
+</table>
+<p style="margin-top:10px;color:#888888;font-size:13px;">Timeline note added to Mike's HubSpot contact. Progressive will assign an adjuster. Want me to draft the FNOL notification email to Mike?</p>`
   },
+
+  // ── 8. List Claims ──
   {
-    id: 8,
-    user: "How much commission did I earn this quarter?",
-    claude: `<strong>YTD 2026 commission: $4,698.15</strong> across all four carriers.<br><br>
-<strong>By carrier:</strong>
-<ul>
-  <li>Hartford: $1,555.20</li>
-  <li>Allstate: $1,424.80</li>
-  <li>Nationwide: $943.25</li>
-  <li>Progressive: $774.90</li>
-</ul>
-<strong>By quarter:</strong>
-<ul>
-  <li>Q1: $2,893.75 — your bigger quarter</li>
-  <li>Q2 (so far): $1,804.40</li>
-</ul>
-<span class="dim">Computed from paid invoices × each carrier's commission rate. Pending invoices not included.</span>`,
-    raw: {
-      "year": 2026,
-      "ytd_total": 4698.15,
-      "by_carrier": {"Hartford": 1555.20, "Allstate": 1424.80, "Nationwide": 943.25, "Progressive": 774.90},
-      "by_quarter": {
-        "Q1": {"Hartford": 1267.20, "Allstate": 423.80, "Nationwide": 530.75, "Progressive": 672.00},
-        "Q2": {"Hartford": 288.00, "Allstate": 1001.00, "Nationwide": 412.50, "Progressive": 102.90}
-      }
-    }
+    nav: 7,
+    label: "List all claims",
+    user: "What are all our open claims right now?",
+    tool: "agentsnap_list_claims",
+    keywords: ["list claims", "all claims", "open claims", "claim status", "show claims"],
+    response: `<div class="badge info">5 claims · 4 active · 1 settled</div>
+<table class="demo-table">
+  <tr><th>Policyholder</th><th>Carrier</th><th>Type</th><th>Status</th><th>Opened</th></tr>
+  <tr><td>Sarah Johnson</td><td>Hartford</td><td>Auto</td><td><span class="chip">under_review</span></td><td>12 days ago</td></tr>
+  <tr><td>Mike Chen</td><td>Progressive</td><td>Property</td><td><span class="chip teal">settled</span></td><td>45 days ago · $12,400</td></tr>
+  <tr><td>Tom Wright</td><td>Hartford</td><td>Auto</td><td><span class="chip">open</span></td><td>5 days ago</td></tr>
+  <tr><td>Lisa Patel</td><td>Allstate</td><td>Liability</td><td><span class="chip gold">investigating</span></td><td>20 days ago</td></tr>
+  <tr><td>Mike Chen</td><td>Progressive</td><td>Property</td><td><span class="chip">open</span></td><td>today</td></tr>
+</table>
+<p style="margin-top:10px;color:#888888;font-size:13px;">Sarah's claim is the oldest active one — adjuster hasn't checked in for 8 days. Want to draft a follow-up to Hartford?</p>`
+  },
+
+  // ── 9. Commission Status ──
+  {
+    nav: 8,
+    label: "Commission status",
+    user: "What's our commission status this year? Show me the quarterly breakdown.",
+    tool: "agentsnap_get_commission_status",
+    keywords: ["commission", "earnings", "ytd", "made this year", "quarterly", "income", "earned"],
+    response: `<div class="badge info">YTD 2026 commission: $4,698.15 · all four carriers</div>
+<table class="demo-table">
+  <tr><th>Carrier</th><th>Rate</th><th>Written</th><th>YTD Earned</th></tr>
+  <tr><td>Hartford</td><td>12.0%</td><td>$12,960</td><td class="amt">$1,555.20</td></tr>
+  <tr><td>Allstate</td><td>13.0%</td><td>$10,960</td><td class="amt">$1,424.80</td></tr>
+  <tr><td>Nationwide</td><td>11.0%</td><td>$8,575</td><td class="amt">$943.25</td></tr>
+  <tr><td>Progressive</td><td>10.5%</td><td>$7,380</td><td class="amt">$774.90</td></tr>
+</table>
+<p style="margin-top:12px;font-weight:600;color:#e8e8e8;font-size:13px;">Quarterly breakdown:</p>
+<table class="demo-table" style="margin-top:6px;">
+  <tr><th>Quarter</th><th>Hartford</th><th>Allstate</th><th>Nationwide</th><th>Progressive</th></tr>
+  <tr><td class="mono">2026-Q1</td><td>$1,267.20</td><td>$423.80</td><td>$530.75</td><td>$672.00</td></tr>
+  <tr><td class="mono">2026-Q2</td><td>$288.00</td><td>$1,001.00</td><td>$412.50</td><td>$102.90</td></tr>
+</table>
+<p style="margin-top:10px;color:#888888;font-size:13px;">Hartford was a strong Q1; Allstate is your Q2 leader so far. Derived live from paid invoices × each carrier's rate — no manual tracking needed.</p>`
+  },
+
+  // ── 10. Refund ──
+  {
+    nav: 9,
+    label: "Process refund",
+    user: "Process a $945 refund for Mike Chen — mid-term policy cancellation on his auto policy.",
+    tool: "agentsnap_create_refund",
+    keywords: ["refund", "cancellation", "return premium", "credit back"],
+    response: `<div class="badge new">↩ Refund initiated</div>
+<table class="demo-table" style="margin-top:8px;">
+  <tr><th>Field</th><th>Value</th></tr>
+  <tr><td>Refund ID</td><td class="chip">RF-2026-0011</td></tr>
+  <tr><td>Policyholder</td><td>Mike Chen</td></tr>
+  <tr><td>Amount</td><td class="amt-warn">$945.00</td></tr>
+  <tr><td>Memo</td><td style="color:#888888;">Mid-term policy cancellation — auto</td></tr>
+  <tr><td>Routing</td><td>SnapRefund · ACH · Mike's verified account</td></tr>
+  <tr><td>Status</td><td><span class="chip">pending</span></td></tr>
+</table>
+<p style="margin-top:10px;color:#888888;font-size:13px;">Mike will receive a payment notification within 1 business day. HubSpot timeline note added. Refund is logged in the audit trail with full traceability.</p>`
+  },
+
+  // ── 11. Bulk Reminders ──
+  {
+    nav: 10,
+    label: "Draft reminders",
+    user: "Draft payment reminders for all overdue accounts.",
+    tool: "agentsnap_bulk_draft_reminders",
+    keywords: ["reminder", "overdue", "past due", "follow up payment", "draft email", "remind"],
+    response: `<div class="badge ok">📬 1 reminder draft ready — not sent yet</div>
+<table class="demo-table" style="margin-top:8px;">
+  <tr><th>Policyholder</th><th>Carrier</th><th>Premium</th><th>Days Overdue</th></tr>
+  <tr><td>Mike Chen</td><td>Progressive</td><td class="amt-warn">$2,210.00</td><td>25</td></tr>
+</table>
+<p style="margin-top:12px;color:#aaa;font-size:13px;font-style:italic;border-left:2px solid #1e3a1e;padding:10px 12px;background:#0d100d;border-radius:4px;">
+"Hi Mike — just a friendly reminder that your Progressive bundle invoice ($2,210.00) is now 25 days past due. You can pay directly here: [payment link]. Reply if you need to discuss a payment plan or if something's changed on your end. — Anis"
+</p>
+<p style="margin-top:10px;color:#888888;font-size:13px;"><strong style="color:#e8e8e8;">$2,210.00 total outstanding.</strong> Send it, or want me to soften the tone first?</p>`
+  },
+
+  // ── 12. AMS 360 Sync ──
+  {
+    nav: 11,
+    label: "AMS 360 sync",
+    user: "If we move Sarah's account to AMS 360 next quarter, what would the sync look like?",
+    tool: "ams360_sync_invoice",
+    keywords: ["ams 360", "ams360", "applied systems", "sync ams"],
+    response: `<div class="badge ams">🏛 AMS 360 — Preview (for when you migrate)</div>
+<p style="font-size:13px;color:#888888;margin-bottom:8px;">Mock preview of what the sync writes to AMS 360 when an agency runs both systems:</p>
+<table class="demo-table" style="margin-top:8px;">
+  <tr><th>Field</th><th>Value</th></tr>
+  <tr><td>AMS Client Code</td><td class="mono">CLI-S-JOHNSON-001</td></tr>
+  <tr><td>AMS Policy</td><td class="mono">POL-HF-2026-001</td></tr>
+  <tr><td>AgentSnap Invoice</td><td class="chip">5022</td></tr>
+  <tr><td>Client Name</td><td>Sarah Johnson</td></tr>
+  <tr><td>Policy Status</td><td><span class="chip teal">Active</span></td></tr>
+  <tr><td>Premium</td><td class="amt">$1,480.00</td></tr>
+  <tr><td>Activity Logged</td><td style="color:#888888;">Invoice #5022 synced · auto-note created</td></tr>
+  <tr><td>Sync Status</td><td><span class="chip" style="color:#4ade80;">✓ Synced</span></td></tr>
+</table>
+<p style="margin-top:10px;color:#888888;font-size:13px;">AgentSnap supports AMS 360 and HawkSoft natively. If you ever move off HubSpot, your data flows the same — no rewrites.</p>`
+  },
+
+  // ── 13. HawkSoft Sync ──
+  {
+    nav: 12,
+    label: "HawkSoft sync",
+    user: "And HawkSoft? Same idea?",
+    tool: "hawksoft_sync_invoice",
+    keywords: ["hawksoft", "sync hawksoft", "cms"],
+    response: `<div class="badge hs">🦅 HawkSoft CMS — Preview</div>
+<table class="demo-table" style="margin-top:8px;">
+  <tr><th>Field</th><th>Value</th></tr>
+  <tr><td>HawkSoft Customer ID</td><td class="mono">HS-S-JOHNSON</td></tr>
+  <tr><td>HawkSoft Policy ID</td><td class="mono">HS-P-001</td></tr>
+  <tr><td>AgentSnap Invoice</td><td class="chip">5022</td></tr>
+  <tr><td>Customer Name</td><td>Sarah Johnson</td></tr>
+  <tr><td>Policy Status</td><td><span class="chip teal">Active</span></td></tr>
+  <tr><td>Premium</td><td class="amt">$1,480.00</td></tr>
+  <tr><td>Action Logged</td><td style="color:#888888;">Invoice Issued · auto-note created</td></tr>
+  <tr><td>Sync Status</td><td><span class="chip" style="color:#4ade80;">✓ Synced</span></td></tr>
+</table>
+<p style="margin-top:10px;color:#888888;font-size:13px;">Same pattern. <strong style="color:#e8e8e8;">HubSpot · AMS 360 · HawkSoft — pick any of the three as your system of record.</strong> AgentSnap meets you where you are.</p>`
+  },
+
+  // ── 14. HubSpot Sync Activity ──
+  {
+    nav: 13,
+    label: "HubSpot activity",
+    user: "Show me everything that's been synced to HubSpot today.",
+    tool: "hubspot_recent_activity",
+    keywords: ["hubspot today", "hubspot activity", "synced today", "what went to hubspot", "hubspot deals"],
+    response: `<div class="badge hub">📋 HubSpot — Today's Sync Activity</div>
+<p style="font-size:12px;color:#5a5a5a;margin-bottom:8px;">2 deals created · 4 timeline notes logged · all auto-traced to audit log:</p>
+<table class="demo-table">
+  <tr><th>Time</th><th>Contact</th><th>Type</th><th>Detail</th></tr>
+  <tr><td>14:08</td><td>Sarah Johnson</td><td><span class="chip hub">Deal</span></td><td>Renewal — Hartford · $1,480</td></tr>
+  <tr><td>14:08</td><td>Sarah Johnson</td><td><span class="chip">Note</span></td><td>"AgentSnap created renewal invoice..."</td></tr>
+  <tr><td>14:23</td><td>Robert Martinez</td><td><span class="chip hub">Deal</span></td><td>Renewal — Hartford · $7,820 (confirmed)</td></tr>
+  <tr><td>14:23</td><td>Robert Martinez</td><td><span class="chip">Note</span></td><td>"AgentSnap created renewal invoice..."</td></tr>
+  <tr><td>14:31</td><td>Mike Chen</td><td><span class="chip">Note</span></td><td>"AgentSnap opened property claim CL-2026-0005..."</td></tr>
+  <tr><td>14:33</td><td>Mike Chen</td><td><span class="chip">Note</span></td><td>"Refund RF-2026-0011 initiated for $945..."</td></tr>
+</table>
+<p style="margin-top:10px;color:#888888;font-size:13px;">Every action above is also in <code class="mono">audit_log.jsonl</code> on disk. Want me to summarize the day's activity as a daily report email?</p>`
+  },
+
+  // ── 15. Custom: Cross-Sell ──
+  {
+    nav: 14,
+    label: "Cross-sell opps",
+    user: "Find me cross-sell opportunities — clients with only auto and no home or bundle.",
+    tool: "agentsnap_cross_sell_search",
+    keywords: ["cross sell", "cross-sell", "upsell", "no home", "only auto", "opportunities"],
+    response: `<div class="badge info">4 cross-sell opportunities · ~$5,420 estimated added premium</div>
+<table class="demo-table">
+  <tr><th>Contact</th><th>Current</th><th>Suggested</th><th>Avg Premium Lift</th><th>Carrier Match</th></tr>
+  <tr><td>Sarah Johnson</td><td>Auto only</td><td>+ Home (Hartford)</td><td class="amt">$1,860 est.</td><td>✓ same carrier</td></tr>
+  <tr><td>Tom Wright</td><td>Auto only</td><td>+ Umbrella (Hartford)</td><td class="amt">$1,400 est.</td><td>✓ same carrier</td></tr>
+  <tr><td>Jennifer Lee</td><td>Auto only</td><td>+ Renters (Progressive)</td><td class="amt">$760 est.</td><td>✓ same carrier</td></tr>
+  <tr><td>Patricia Garcia</td><td>Auto only</td><td>+ Home (Hartford)</td><td class="amt">$1,400 est.</td><td>✓ same carrier</td></tr>
+</table>
+<p style="margin-top:10px;color:#888888;font-size:13px;">Sarah Johnson is your strongest signal — same carrier already, renewal in 13 days = natural conversation opening. Want me to draft a discovery message for her?</p>`
+  },
+
+  // ── 16. Custom: Best Carrier ──
+  {
+    nav: 15,
+    label: "Best carrier",
+    user: "Which carrier is my best performer this year?",
+    tool: "agentsnap_carrier_analysis",
+    keywords: ["best carrier", "best performer", "top carrier", "carrier ranking", "which carrier", "carrier performance"],
+    response: `<div class="badge info">2026 Carrier Performance — YTD</div>
+<table class="demo-table">
+  <tr><th>Carrier</th><th>Policies</th><th>Written</th><th>Earned</th><th>Loss Ratio</th><th>Retention</th></tr>
+  <tr><td><strong>Hartford</strong></td><td>5</td><td>$12,960</td><td class="amt">$1,555.20</td><td>14%</td><td><span class="chip teal">95%</span></td></tr>
+  <tr><td>Allstate</td><td>3</td><td>$10,960</td><td class="amt">$1,424.80</td><td>22%</td><td><span class="chip">88%</span></td></tr>
+  <tr><td>Nationwide</td><td>2</td><td>$8,575</td><td class="amt">$943.25</td><td>0%</td><td><span class="chip teal">100%</span></td></tr>
+  <tr><td>Progressive</td><td>3</td><td>$7,380</td><td class="amt">$774.90</td><td>168%</td><td><span class="chip gold">75%</span></td></tr>
+</table>
+<p style="margin-top:10px;color:#888888;font-size:13px;"><strong style="color:#e8e8e8;">Hartford</strong> is your best mix: highest written premium, highest commission rate, low loss ratio, strongest retention. Progressive's loss ratio is concerning (Mike's claims) — worth a conversation with the underwriter.</p>`
+  },
+
+  // ── 17. Custom: Renewal Email Draft ──
+  {
+    nav: 16,
+    label: "Draft renewal email",
+    user: "Draft a renewal reminder email to Sarah Johnson — her policy expires in 13 days.",
+    tool: "agentsnap_draft_renewal_email",
+    keywords: ["draft renewal", "renewal email", "email sarah", "draft email", "write email"],
+    response: `<div class="badge new">✉️ Draft renewal email — Sarah Johnson</div>
+<table class="demo-table">
+  <tr><th>Field</th><th>Value</th></tr>
+  <tr><td>To</td><td>sarah.johnson@example.com</td></tr>
+  <tr><td>Subject</td><td>Your Hartford auto policy renews June 2 — quick check-in</td></tr>
+</table>
+<p style="margin-top:14px;color:#cccccc;font-size:13.5px;line-height:1.65;border-left:2px solid #1e3a1e;padding:12px;background:#0d100d;border-radius:4px;">
+Hi Sarah,<br><br>
+Quick heads-up — your Hartford auto policy is up for renewal on <strong>June 2, 2026</strong>. The renewal premium is <strong>$1,480</strong>, the same as last year (Hartford held the line for you).<br><br>
+A few quick questions before we lock it in:<br>
+&nbsp;• Any change in commute or annual mileage?<br>
+&nbsp;• Any new drivers or vehicles?<br>
+&nbsp;• Still happy with $500/$1,000 deductibles?<br><br>
+One more thing — Hartford offers a home + auto bundle discount that could save you ~15% if you're considering home coverage. Happy to run a quick quote if it's interesting.<br><br>
+Just reply with answers and I'll have your renewal ready to sign by Friday.<br><br>
+— Anis
+</p>
+<p style="margin-top:10px;color:#888888;font-size:13px;">Tone tuned to your normal voice. Want me to send it, schedule it, or tweak anything first?</p>`
+  },
+
+  // ── 18. Custom: Q3 Commission Projection ──
+  {
+    nav: 17,
+    label: "Project Q3 commission",
+    user: "Project my Q3 commission based on the renewal pipeline.",
+    tool: "agentsnap_commission_projection",
+    keywords: ["project", "forecast", "projection", "q3", "expected commission", "next quarter", "predict"],
+    response: `<div class="badge info">Q3 2026 commission projection · based on current pipeline</div>
+<table class="demo-table">
+  <tr><th>Source</th><th>Expected Premium</th><th>Commission</th><th>Confidence</th></tr>
+  <tr><td>Hartford renewals (4)</td><td>$11,440</td><td class="amt">$1,372.80</td><td><span class="chip teal">High (95%)</span></td></tr>
+  <tr><td>Allstate renewals (1)</td><td>$1,920</td><td class="amt">$249.60</td><td><span class="chip teal">High (95%)</span></td></tr>
+  <tr><td>Nationwide renewals (1)</td><td>$1,675</td><td class="amt">$184.25</td><td><span class="chip teal">High (95%)</span></td></tr>
+  <tr><td>Progressive renewals (2)</td><td>$3,190</td><td class="amt">$334.95</td><td><span class="chip gold">Mid (75%)</span></td></tr>
+  <tr><td>Cross-sell pipeline</td><td>$5,420</td><td class="amt">$650.40</td><td><span class="chip">Low (30%)</span></td></tr>
+</table>
+<p style="margin-top:12px;color:#cccccc;font-size:14px;"><strong>Base case Q3 commission: $2,141.60</strong> (high-confidence renewals only).<br><strong>Upside if cross-sell hits: $2,792.00</strong> (+30%).</p>
+<p style="margin-top:8px;color:#888888;font-size:13px;">Loss assumption: 5% non-renewal rate (your historical average is 4%). Want me to build a follow-up plan for the Progressive renewals to lift their confidence?</p>`
   }
 ];
 
 // ============================================================================
-// UI logic
+//   Sidebar groupings
+// ============================================================================
+const GROUPS = [
+  { label: null,                    from: 0,  to: 5  },  // first group has no top section header
+  { label: "Claims",                from: 6,  to: 7  },
+  { label: "Financials",            from: 8,  to: 10 },
+  { label: "Sync · AMS · HubSpot",  from: 11, to: 13 },
+  { label: "Custom Agency Queries", from: 14, to: 17 }
+];
+
+// ============================================================================
+//   STATE
+// ============================================================================
+let current = 0;
+let usedSet = new Set();
+
+// ============================================================================
+//   RENDER
 // ============================================================================
 
-const chat = document.getElementById("chat");
-const emptyState = document.getElementById("empty-state");
-const promptsContainer = document.getElementById("prompts");
-const resetBtn = document.getElementById("reset-btn");
+function renderSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  sidebar.innerHTML = '';
 
-const usedIds = new Set();
+  const topLabel = document.createElement('div');
+  topLabel.className = 'sidebar-label';
+  topLabel.textContent = 'Morning Workflow';
+  sidebar.appendChild(topLabel);
 
-function renderPromptButtons() {
-  promptsContainer.innerHTML = "";
-  PROMPTS.forEach((p) => {
-    const btn = document.createElement("button");
-    btn.dataset.id = p.id;
-    if (usedIds.has(p.id)) btn.classList.add("used");
-    btn.innerHTML = `<span class="num">${p.id}.</span>${p.user}`;
-    btn.addEventListener("click", () => runPrompt(p));
-    promptsContainer.appendChild(btn);
+  let stepNum = 1;
+  GROUPS.forEach((group) => {
+    if (group.label) {
+      const section = document.createElement('div');
+      section.className = 'sidebar-section';
+      section.textContent = group.label;
+      sidebar.appendChild(section);
+    }
+    for (let i = group.from; i <= group.to; i++) {
+      const step = STEPS[i];
+      const el = document.createElement('div');
+      el.className = 'step-item';
+      el.id = `nav-${i}`;
+      el.dataset.idx = i;
+      el.innerHTML = `<div class="step-num">${stepNum}</div> ${step.label}`;
+      el.addEventListener('click', () => runStep(i));
+      sidebar.appendChild(el);
+      stepNum++;
+    }
+  });
+  updateNav();
+}
+
+function updateNav() {
+  STEPS.forEach((_, i) => {
+    const el = document.getElementById(`nav-${i}`);
+    if (!el) return;
+    el.classList.remove('active', 'done');
+    if (usedSet.has(i)) el.classList.add('done');
+  });
+  if (current < STEPS.length) {
+    const el = document.getElementById(`nav-${current}`);
+    if (el) el.classList.add('active');
+  }
+}
+
+function addMessage(type, html) {
+  const welcome = document.getElementById('welcome');
+  if (welcome) welcome.remove();
+
+  const messages = document.getElementById('messages');
+  const row = document.createElement('div');
+  row.className = `msg-row ${type}`;
+  if (type === 'user') {
+    row.innerHTML = `<div class="bubble user">${html}</div><div class="avatar user">You</div>`;
+  } else {
+    row.innerHTML = `<div class="avatar claude">A</div><div class="bubble claude">${html}</div>`;
+  }
+  messages.appendChild(row);
+  setTimeout(() => messages.scrollTop = messages.scrollHeight, 50);
+}
+
+function addToolCall(toolName) {
+  const messages = document.getElementById('messages');
+  const row = document.createElement('div');
+  row.className = 'msg-row';
+  row.style.padding = '2px 28px';
+  row.innerHTML = `<div style="max-width:880px;width:100%;margin:0 auto;"><div class="tool-call">🔧 ${toolName}()</div></div>`;
+  messages.appendChild(row);
+}
+
+function runStep(idx) {
+  if (idx < 0 || idx >= STEPS.length) return;
+  const step = STEPS[idx];
+  usedSet.add(idx);
+
+  if (idx === current) current = idx + 1;
+  if (idx > current) current = idx + 1;
+
+  addMessage('user', step.user);
+  setTimeout(() => {
+    addToolCall(step.tool);
+    setTimeout(() => {
+      addMessage('claude', step.response);
+      attachSuggestionClicks();
+      updateNav();
+      updateBottom();
+    }, 400);
+  }, 300);
+}
+
+function advance() {
+  if (current >= STEPS.length) return;
+  runStep(current);
+}
+
+function updateBottom() {
+  const previewWrap = document.getElementById('next-preview');
+  const previewText = document.getElementById('next-text');
+  const counter = document.getElementById('counter');
+  const btn = document.getElementById('btn-next');
+  if (current < STEPS.length) {
+    const next = STEPS[current];
+    const short = next.user.length > 65 ? next.user.slice(0, 65) + '…' : next.user;
+    previewText.textContent = `"${short}"`;
+    btn.textContent = 'Send Next ›';
+    btn.disabled = false;
+  } else {
+    previewWrap.innerHTML =
+      `<span style="color:#4ade80;">✓ All 18 prompts complete · type a custom one below or restart</span>`;
+    btn.textContent = 'Done';
+    btn.disabled = true;
+  }
+  counter.textContent = `${Math.min(current + 1, STEPS.length)} / ${STEPS.length}`;
+}
+
+function restart() {
+  current = 0;
+  usedSet.clear();
+  const messages = document.getElementById('messages');
+  messages.innerHTML = `
+    <div class="welcome" id="welcome">
+      <h1>Try the AgentSnap demo</h1>
+      <p>Every response below is real output from the MCP server.<br>
+        <strong>Click "Send Next"</strong> to walk the workflow, <strong>jump</strong> to any step on the left, or <strong>type your own question</strong> at the bottom.</p>
+      <div class="hint">
+        Try: <kbd>What's on my plate today?</kbd> &nbsp;·&nbsp; <kbd>Find cross-sell opportunities</kbd> &nbsp;·&nbsp; <kbd>Best carrier this year?</kbd>
+      </div>
+    </div>`;
+  document.getElementById('next-preview').innerHTML =
+    `<span class="note">Next ▸</span> <span id="next-text">"${STEPS[0].user.slice(0, 65)}"</span>`;
+  updateNav();
+  updateBottom();
+}
+
+// ============================================================================
+//   FREEFORM TEXT INPUT
+// ============================================================================
+
+function handleCustomInput() {
+  const input = document.getElementById('custom-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+
+  const matched = findBestMatch(text);
+  if (matched) {
+    addMessage('user', escapeHtml(text));
+    setTimeout(() => {
+      addToolCall(STEPS[matched.idx].tool);
+      setTimeout(() => {
+        addMessage('claude', STEPS[matched.idx].response);
+        usedSet.add(matched.idx);
+        if (matched.idx === current) current = matched.idx + 1;
+        updateNav();
+        updateBottom();
+        attachSuggestionClicks();
+      }, 400);
+    }, 300);
+  } else {
+    addMessage('user', escapeHtml(text));
+    setTimeout(() => {
+      addMessage('claude', renderNoMatchHelp(text));
+      attachSuggestionClicks();
+    }, 350);
+  }
+}
+
+function findBestMatch(text) {
+  const t = text.toLowerCase();
+  let bestScore = 0;
+  let bestIdx = -1;
+  STEPS.forEach((step, idx) => {
+    let score = 0;
+    step.keywords.forEach(k => {
+      if (t.includes(k.toLowerCase())) {
+        score += k.length;
+      }
+    });
+    if (score > bestScore) {
+      bestScore = score;
+      bestIdx = idx;
+    }
+  });
+  return bestIdx >= 0 && bestScore > 2 ? { idx: bestIdx, score: bestScore } : null;
+}
+
+function renderNoMatchHelp(text) {
+  const suggestions = [STEPS[0], STEPS[1], STEPS[8], STEPS[14], STEPS[16]];
+  return `<div class="badge warn">Heads-up — this is a demo</div>
+<p>The demo only runs the 18 pre-loaded commands. <strong>To ask anything with your real data</strong>, install AgentSnap locally (5 minutes) and Claude will answer with the live model + your real HubSpot:</p>
+<p style="margin-top:8px;">
+  <a href="https://github.com/aisoundz/agentsnap-hubspot-demo/releases/download/v1.0/agentsnap-hubspot-demo.zip" style="color:#4ade80;font-weight:600;text-decoration:none;border-bottom:1px dashed #2a4a2a;">↓ Download AgentSnap v1.0</a>
+  &nbsp;·&nbsp;
+  <a href="https://github.com/aisoundz/agentsnap-hubspot-demo" target="_blank" style="color:#6dcf6d;">View source</a>
+</p>
+<p style="margin-top:14px;color:#888888;font-size:13px;">In the meantime, here are demo prompts that might be close to "${escapeHtml(text.slice(0, 40))}${text.length > 40 ? '…' : ''}":</p>
+<div class="suggestions">
+  ${suggestions.map(s => `<div class="pill" data-idx="${STEPS.indexOf(s)}">${escapeHtml(s.user.slice(0, 55))}${s.user.length > 55 ? '…' : ''}</div>`).join('')}
+</div>`;
+}
+
+function attachSuggestionClicks() {
+  document.querySelectorAll('.suggestions .pill').forEach(p => {
+    if (p.dataset.bound) return;
+    p.dataset.bound = '1';
+    p.addEventListener('click', () => runStep(parseInt(p.dataset.idx, 10)));
   });
 }
 
-function runPrompt(p) {
-  if (emptyState && emptyState.parentNode === chat) {
-    chat.removeChild(emptyState);
+function escapeHtml(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// ============================================================================
+//   WIRE UP
+// ============================================================================
+
+document.getElementById('custom-send').addEventListener('click', handleCustomInput);
+document.getElementById('custom-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    handleCustomInput();
   }
-  usedIds.add(p.id);
-  renderPromptButtons();
+});
 
-  // User turn
-  const userTurn = document.createElement("div");
-  userTurn.className = "turn user";
-  userTurn.innerHTML = `
-    <div class="speaker">You</div>
-    <div class="bubble">${escapeHtml(p.user)}</div>
-  `;
-  chat.appendChild(userTurn);
-
-  // Claude turn (delayed for natural feel)
-  setTimeout(() => {
-    const claudeTurn = document.createElement("div");
-    claudeTurn.className = "turn claude";
-    const rawId = `raw-${p.id}`;
-    claudeTurn.innerHTML = `
-      <div class="speaker">Claude · via AgentSnap MCP</div>
-      <div class="bubble">
-        ${p.claude}
-        <div class="raw-toggle" data-target="${rawId}">▾ show raw MCP response</div>
-        <div class="raw-json" id="${rawId}">${escapeHtml(JSON.stringify(p.raw, null, 2))}</div>
-      </div>
-    `;
-    chat.appendChild(claudeTurn);
-    claudeTurn.querySelector(".raw-toggle").addEventListener("click", (e) => {
-      const target = document.getElementById(e.target.dataset.target);
-      target.classList.toggle("open");
-      e.target.textContent = target.classList.contains("open")
-        ? "▴ hide raw MCP response"
-        : "▾ show raw MCP response";
-    });
-    chat.scrollTop = chat.scrollHeight;
-  }, 320);
-
-  chat.scrollTop = chat.scrollHeight;
-}
-
-function escapeHtml(str) {
-  return String(str)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-}
-
-function reset() {
-  chat.innerHTML = "";
-  chat.appendChild(emptyState);
-  usedIds.clear();
-  renderPromptButtons();
-}
-
-resetBtn.addEventListener("click", reset);
-renderPromptButtons();
+renderSidebar();
+updateBottom();
 </script>
-
 </body>
 </html>
