@@ -44,16 +44,9 @@
     flex-shrink: 0;
   }
   .logo { display: flex; align-items: center; gap: 14px; }
-  .logo-link {
-    display: inline-flex; align-items: center; gap: 10px;
-    text-decoration: none;
-  }
-  .logo-img {
-    height: 32px; width: auto; display: block;
-  }
-  .logo-fallback {
-    align-items: center; gap: 10px;
-  }
+  .logo-link { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
+  .logo-img { height: 32px; width: auto; display: block; }
+  .logo-fallback { align-items: center; gap: 10px; }
   .logo-fallback .mark {
     width: 30px; height: 30px;
     background: linear-gradient(135deg, var(--green), var(--green-dark));
@@ -63,25 +56,220 @@
     box-shadow: 0 1px 3px rgba(46, 138, 46, 0.4);
   }
   .logo-fallback .word {
-    font-weight: 700; font-size: 17px; color: var(--text);
-    letter-spacing: -0.01em;
+    font-weight: 700; font-size: 17px; color: var(--text); letter-spacing: -0.01em;
   }
   .logo-fallback .word .accent { color: var(--green-bright); }
   .logo-divider { width: 1px; height: 28px; background: #2a2a2a; }
-  .logo-sub {
-    font-size: 11.5px; color: var(--text-muted); letter-spacing: 0.01em;
-  }
+  .logo-sub { font-size: 11.5px; color: var(--text-muted); letter-spacing: 0.01em; }
+
+  /* Status pill — now a button */
   .status-pill {
-    display: flex; align-items: center; gap: 6px;
+    display: inline-flex; align-items: center; gap: 6px;
     background: #0d1a0d; border: 1px solid #1e3a1e;
-    border-radius: 20px; padding: 5px 14px;
+    border-radius: 20px; padding: 6px 16px;
     font-size: 12px; color: var(--green-bright);
+    cursor: pointer; font-family: inherit;
+    transition: all 0.15s;
+  }
+  .status-pill:hover { background: #122412; border-color: #2a4a2a; }
+  .status-pill.disconnected {
+    background: #1a1408; border-color: #3a2810; color: #ff9c66;
+  }
+  .status-pill.disconnected:hover { background: #221a0c; border-color: #4a3618; }
+  .status-pill.connected {
+    background: #0a1a0a; border-color: #2a5a2a; color: var(--green-bright);
+    box-shadow: 0 0 0 1px rgba(74, 222, 128, 0.1);
+  }
+  .status-pill.connecting {
+    background: #1a1a08; border-color: #3a3010; color: #fbbf24;
   }
   .status-dot {
     width: 7px; height: 7px; border-radius: 50%;
-    background: var(--green-bright); animation: pulse 2s infinite;
+    background: currentColor; animation: pulse 2s infinite;
   }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  /* ── Modal ── */
+  .modal-backdrop {
+    position: fixed; inset: 0;
+    background: rgba(0, 0, 0, 0.78);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    z-index: 1000;
+    display: none;
+    align-items: center; justify-content: center;
+    padding: 20px;
+    animation: fadeIn 0.2s ease;
+  }
+  .modal-backdrop.open { display: flex; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .modal {
+    background: #0f1410;
+    border: 1px solid #1e3a1e;
+    border-radius: 16px;
+    width: 100%; max-width: 540px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 28px;
+    animation: slideUp 0.25s ease;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .modal-close {
+    position: absolute; top: 14px; right: 14px;
+    background: transparent; border: none; color: #5a5a5a;
+    font-size: 22px; cursor: pointer; padding: 4px 8px;
+    transition: color 0.15s;
+  }
+  .modal-close:hover { color: var(--text); }
+  .modal h2 {
+    font-size: 22px; color: var(--text); margin-bottom: 6px;
+    letter-spacing: -0.01em;
+  }
+  .modal p.modal-lede {
+    color: #9aa4a0; font-size: 14px; line-height: 1.55;
+    margin-bottom: 18px;
+  }
+  .modal .privacy-block {
+    background: #0a140a;
+    border: 1px solid #1e3a1e;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 18px;
+    font-size: 12.5px;
+    color: #9adba0;
+    line-height: 1.55;
+  }
+  .modal .privacy-block strong { color: var(--green-bright); }
+  .modal .privacy-block .lock { color: var(--green-bright); margin-right: 4px; }
+
+  .modal details.token-help {
+    background: #0d100d;
+    border: 1px solid #1a1f1a;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .modal details.token-help summary {
+    padding: 11px 14px;
+    cursor: pointer;
+    color: #8ab08a;
+    font-size: 13px;
+    font-weight: 500;
+    user-select: none;
+    list-style: none;
+  }
+  .modal details.token-help summary::-webkit-details-marker { display: none; }
+  .modal details.token-help summary::before {
+    content: '▸ ';
+    color: var(--green);
+    margin-right: 4px;
+    display: inline-block;
+    transition: transform 0.15s;
+  }
+  .modal details.token-help[open] summary::before { transform: rotate(90deg); }
+  .modal details.token-help[open] summary { border-bottom: 1px solid #1a1f1a; }
+  .modal details.token-help .help-body {
+    padding: 14px;
+    font-size: 13px;
+    line-height: 1.65;
+    color: #b0b8b0;
+  }
+  .modal details.token-help .help-body ol { padding-left: 22px; }
+  .modal details.token-help .help-body li { margin: 4px 0; }
+  .modal details.token-help .help-body code {
+    background: #0a0e0a; border: 1px solid #1e2a1e;
+    padding: 1px 6px; border-radius: 3px;
+    font-family: 'SF Mono', monospace; font-size: 12px;
+    color: var(--green-bright);
+  }
+  .modal label.input-label {
+    display: block; font-size: 12px; color: var(--text-muted);
+    letter-spacing: 0.08em; text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .modal input.token-input {
+    width: 100%;
+    background: #0a0e0a; border: 1px solid #1e3a1e;
+    border-radius: 8px; padding: 12px 14px;
+    color: var(--text); font-size: 13.5px;
+    font-family: 'SF Mono', monospace;
+    margin-bottom: 16px;
+    transition: border-color 0.15s;
+  }
+  .modal input.token-input:focus {
+    outline: none; border-color: var(--green-bright);
+    background: #0d120d;
+  }
+  .modal .modal-actions {
+    display: flex; gap: 10px; justify-content: flex-end;
+  }
+  .modal-btn {
+    padding: 10px 20px; border-radius: 8px;
+    font-size: 13.5px; font-weight: 600;
+    cursor: pointer; font-family: inherit;
+    transition: all 0.15s;
+    border: none;
+  }
+  .modal-btn.cancel {
+    background: transparent; color: var(--text-muted);
+    border: 1px solid #2a2a2a;
+  }
+  .modal-btn.cancel:hover { color: var(--text); background: #1a1a1a; }
+  .modal-btn.primary {
+    background: linear-gradient(135deg, var(--green), var(--green-dark));
+    color: #fff;
+    box-shadow: 0 1px 4px rgba(46, 138, 46, 0.3);
+  }
+  .modal-btn.primary:hover { transform: translateY(-1px); }
+  .modal-btn.primary:disabled {
+    opacity: 0.5; cursor: not-allowed; transform: none;
+  }
+
+  .modal .connect-status {
+    display: none;
+    margin-top: 16px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.65;
+  }
+  .modal .connect-status.success {
+    background: #0a1a0a; border: 1px solid #2a5a2a; color: var(--green-bright);
+    display: block;
+  }
+  .modal .connect-status.success ul { margin: 6px 0 0 20px; }
+  .modal .connect-status.success li { margin: 2px 0; color: #b0d8b0; font-size: 12.5px; }
+  .modal .connect-status.success li .mapped { color: var(--green-bright); }
+  .modal .connect-status.success li .original { color: #6a8a6a; font-family: 'SF Mono', monospace; font-size: 11.5px; }
+  .modal .connect-status.error {
+    background: #1a0a0a; border: 1px solid #5a2a2a; color: #f87171;
+    display: block;
+  }
+
+  /* Live mode banner */
+  .live-banner {
+    background: linear-gradient(90deg, #0d1a0d, #0a140a);
+    border-bottom: 1px solid #1e3a1e;
+    padding: 8px 28px;
+    font-size: 12.5px;
+    color: #9adba0;
+    display: none;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .live-banner.visible { display: flex; }
+  .live-banner strong { color: var(--green-bright); font-weight: 700; }
+  .live-banner .disconnect-link {
+    margin-left: auto; color: #6a8a6a; cursor: pointer; font-size: 12px;
+    background: transparent; border: none; font-family: inherit;
+    text-decoration: underline; text-decoration-style: dotted;
+  }
+  .live-banner .disconnect-link:hover { color: var(--text); }
 
   /* ── Layout ── */
   .layout { display: flex; flex: 1; overflow: hidden; }
@@ -93,22 +281,18 @@
     border-right: 1px solid var(--border);
     padding: 18px 0 80px;
     flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
+    display: flex; flex-direction: column; gap: 1px;
     overflow-y: auto;
   }
   .sidebar-label {
     font-size: 10px; font-weight: 700; color: #3a3a3a;
-    letter-spacing: 0.10em; text-transform: uppercase;
-    padding: 0 16px 8px;
+    letter-spacing: 0.10em; text-transform: uppercase; padding: 0 16px 8px;
   }
   .sidebar-section {
     font-size: 10px; font-weight: 700; color: #2a3a2a;
     letter-spacing: 0.08em; text-transform: uppercase;
     padding: 12px 16px 5px;
-    border-top: 1px solid #1a1a1a;
-    margin-top: 6px;
+    border-top: 1px solid #1a1a1a; margin-top: 6px;
   }
   .step-item {
     display: flex; align-items: center; gap: 10px;
@@ -116,15 +300,21 @@
     border-left: 3px solid transparent;
     font-size: 12.5px; color: #585858;
     transition: background 0.15s, color 0.15s;
+    position: relative;
   }
   .step-item:hover { background: #111811; color: #b0d8b0; }
   .step-item.active {
-    background: #111811;
-    border-left-color: var(--green);
-    color: #d0e8d0;
+    background: #111811; border-left-color: var(--green); color: #d0e8d0;
   }
-  .step-item.done    { color: #3a5a3a; }
+  .step-item.done { color: #3a5a3a; }
   .step-item.done .step-num { background: #0d1f0d; color: var(--green-bright); }
+  .step-item.has-live::after {
+    content: '⚡';
+    margin-left: auto;
+    font-size: 11px;
+    color: var(--green-bright);
+    opacity: 0.6;
+  }
   .step-num {
     width: 20px; height: 20px; border-radius: 50%;
     background: #1a1a1a; font-size: 11px; font-weight: 600;
@@ -141,81 +331,51 @@
   .messages::-webkit-scrollbar { width: 4px; }
   .messages::-webkit-scrollbar-thumb { background: #2a3a2a; border-radius: 4px; }
 
-  /* Welcome screen — redesigned */
+  /* Welcome screen */
   .welcome {
-    max-width: 680px;
-    margin: 56px auto 0;
-    padding: 0 32px;
+    max-width: 680px; margin: 56px auto 0; padding: 0 32px;
     text-align: center;
   }
   .welcome .eyebrow {
     display: inline-block;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.14em; text-transform: uppercase;
     color: var(--green-bright);
     background: rgba(46, 138, 46, 0.08);
     border: 1px solid rgba(46, 138, 46, 0.25);
-    border-radius: 999px;
-    padding: 5px 14px;
+    border-radius: 999px; padding: 5px 14px;
     margin-bottom: 22px;
   }
   .welcome h1 {
-    font-size: 30px;
-    line-height: 1.15;
-    color: var(--text);
-    margin-bottom: 14px;
-    letter-spacing: -0.02em;
-    font-weight: 700;
+    font-size: 30px; line-height: 1.15; color: var(--text);
+    margin-bottom: 14px; letter-spacing: -0.02em; font-weight: 700;
   }
   .welcome .lede {
-    font-size: 15.5px;
-    line-height: 1.6;
-    color: #a0a8a0;
-    margin-bottom: 28px;
-    max-width: 560px;
-    margin-left: auto;
-    margin-right: auto;
+    font-size: 15.5px; line-height: 1.6; color: #a0a8a0;
+    margin-bottom: 28px; max-width: 560px;
+    margin-left: auto; margin-right: auto;
   }
   .welcome .lede strong { color: var(--text); font-weight: 600; }
   .welcome .qs-label {
-    font-size: 11px;
-    color: var(--text-muted);
-    letter-spacing: 0.10em;
-    text-transform: uppercase;
-    margin-bottom: 14px;
+    font-size: 11px; color: var(--text-muted);
+    letter-spacing: 0.10em; text-transform: uppercase; margin-bottom: 14px;
   }
   .quick-starts {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 8px;
-    margin-bottom: 28px;
+    display: flex; flex-wrap: wrap; justify-content: center;
+    gap: 8px; margin-bottom: 28px;
   }
   .qs-pill {
-    background: #131c13;
-    border: 1px solid #1e3a1e;
-    color: #b0d8b0;
-    border-radius: 8px;
-    padding: 9px 16px;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.15s;
-    font-family: inherit;
-    line-height: 1.3;
+    background: #131c13; border: 1px solid #1e3a1e; color: #b0d8b0;
+    border-radius: 8px; padding: 9px 16px;
+    font-size: 13px; font-weight: 500; cursor: pointer;
+    transition: all 0.15s; font-family: inherit; line-height: 1.3;
   }
   .qs-pill:hover {
-    background: #1a2a1a;
-    border-color: var(--green);
-    color: var(--green-bright);
+    background: #1a2a1a; border-color: var(--green); color: var(--green-bright);
     transform: translateY(-1px);
   }
   .welcome .walk-hint {
-    font-size: 13.5px;
-    color: var(--text-muted);
-    margin-top: 8px;
+    font-size: 13.5px; color: var(--text-muted); margin-top: 8px;
   }
   .welcome .walk-hint strong { color: var(--green-bright); font-weight: 600; }
 
@@ -260,6 +420,10 @@
     font-size: 11px; color: #4a6a4a; margin-bottom: 8px;
     font-family: 'SF Mono', 'Fira Code', monospace;
   }
+  .tool-call.live {
+    background: #0a1a0a; border-color: #2a5a2a; color: var(--green-bright);
+  }
+  .tool-call.live::before { content: '⚡ '; }
 
   .badge {
     display: inline-flex; align-items: center; gap: 5px;
@@ -274,6 +438,7 @@
   .badge.ams  { background:#1a1000; color:#fbbf24; border:1px solid #3a2800; }
   .badge.hs   { background:#001818; color:#2dd4bf; border:1px solid #003232; }
   .badge.hub  { background:#1a0e08; color:#ff8a4c; border:1px solid #3a1d10; }
+  .badge.live { background:#0a1a0a; color:var(--green-bright); border:1px solid #2a5a2a; }
 
   .demo-table { width:100%; border-collapse:collapse; font-size:13px; margin-top:8px; }
   .demo-table th {
@@ -304,142 +469,91 @@
     cursor: pointer; transition: all 0.15s;
   }
   .suggestions .pill:hover {
-    background: #1a2a1a; border-color: #2a4a2a;
-    color: var(--green-bright);
+    background: #1a2a1a; border-color: #2a4a2a; color: var(--green-bright);
   }
 
-  /* ── Completion screen (replaces "Done" disabled state) ── */
+  /* Completion screen */
   .completion {
-    max-width: 640px;
-    margin: 40px auto 0;
-    padding: 32px;
+    max-width: 640px; margin: 40px auto 0; padding: 32px;
     background: linear-gradient(180deg, #0d1a0d 0%, #0a140a 100%);
-    border: 1px solid #1e3a1e;
-    border-radius: 16px;
-    text-align: center;
+    border: 1px solid #1e3a1e; border-radius: 16px; text-align: center;
     animation: fadeUp 0.4s ease forwards;
   }
   .completion .badge-done {
-    display: inline-block;
-    background: rgba(74, 222, 128, 0.12);
-    border: 1px solid rgba(74, 222, 128, 0.4);
-    color: var(--green-bright);
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    padding: 5px 14px;
-    border-radius: 999px;
+    display: inline-block; background: rgba(74, 222, 128, 0.12);
+    border: 1px solid rgba(74, 222, 128, 0.4); color: var(--green-bright);
+    font-size: 11px; font-weight: 600; letter-spacing: 0.14em;
+    text-transform: uppercase; padding: 5px 14px; border-radius: 999px;
     margin-bottom: 18px;
   }
   .completion h2 {
-    font-size: 26px;
-    line-height: 1.2;
-    color: var(--text);
-    margin-bottom: 14px;
-    letter-spacing: -0.01em;
-    font-weight: 700;
+    font-size: 26px; line-height: 1.2; color: var(--text);
+    margin-bottom: 14px; letter-spacing: -0.01em; font-weight: 700;
   }
   .completion p {
-    font-size: 14.5px;
-    line-height: 1.6;
-    color: #a0a8a0;
-    margin-bottom: 14px;
-    max-width: 520px;
+    font-size: 14.5px; line-height: 1.6; color: #a0a8a0;
+    margin-bottom: 14px; max-width: 520px;
     margin-left: auto; margin-right: auto;
   }
   .completion .emphasis {
-    color: var(--text);
-    font-weight: 600;
-    font-size: 16px;
-    margin-top: 18px;
-    margin-bottom: 18px;
+    color: var(--text); font-weight: 600; font-size: 16px;
+    margin-top: 18px; margin-bottom: 18px;
   }
   .completion-actions {
-    display: flex;
-    gap: 12px;
-    justify-content: center;
-    flex-wrap: wrap;
-    margin-bottom: 14px;
+    display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 14px;
   }
   .cta-primary, .cta-secondary {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 22px;
-    border-radius: 10px;
-    font-weight: 700;
-    font-size: 14px;
-    text-decoration: none;
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 22px; border-radius: 10px;
+    font-weight: 700; font-size: 14px; text-decoration: none;
     transition: transform 0.1s, opacity 0.15s;
-    font-family: inherit;
-    cursor: pointer;
-    border: none;
+    font-family: inherit; cursor: pointer; border: none;
   }
   .cta-primary {
     background: linear-gradient(135deg, var(--green), var(--green-dark));
-    color: #fff;
-    box-shadow: 0 2px 8px rgba(46, 138, 46, 0.3);
+    color: #fff; box-shadow: 0 2px 8px rgba(46, 138, 46, 0.3);
   }
   .cta-secondary {
-    background: transparent;
-    color: var(--green-bright);
+    background: transparent; color: var(--green-bright);
     border: 1px solid #2a4a2a;
   }
   .cta-primary:hover, .cta-secondary:hover { transform: translateY(-1px); }
   .completion .restart-link {
-    margin-top: 12px;
-    font-size: 13px;
-    color: var(--text-muted);
+    margin-top: 12px; font-size: 13px; color: var(--text-muted);
   }
   .completion .restart-link a {
-    color: #6dcf6d;
-    text-decoration: none;
-    border-bottom: 1px dashed #2a4a2a;
-    cursor: pointer;
+    color: #6dcf6d; text-decoration: none;
+    border-bottom: 1px dashed #2a4a2a; cursor: pointer;
   }
   .completion .restart-link a:hover { color: var(--green-bright); }
 
   /* ── Bottom bar ── */
   .bottom-bar {
     border-top:1px solid var(--border);
-    background:var(--bg-header);
-    flex-shrink:0;
+    background:var(--bg-header); flex-shrink:0;
   }
-  .bar-row {
-    padding: 12px 28px;
-    display: flex; align-items: center; gap: 12px;
-  }
+  .bar-row { padding: 12px 28px; display: flex; align-items: center; gap: 12px; }
   .bar-row.input-row { border-top: 1px solid #1a1a1a; padding-top: 10px; padding-bottom: 14px; }
-
-  .input-wrap {
-    flex: 1; position: relative;
-  }
+  .input-wrap { flex: 1; position: relative; }
   .input-wrap input {
     width: 100%;
     background: #0d120d; border: 1px solid #1e2a1e;
     border-radius: 10px; padding: 11px 110px 11px 16px;
     color: var(--text); font-size: 14px;
-    font-family: inherit;
-    transition: border-color 0.15s;
+    font-family: inherit; transition: border-color 0.15s;
   }
   .input-wrap input::placeholder { color: #3a3a3a; }
   .input-wrap input:focus {
-    outline: none; border-color: var(--green);
-    background: #101610;
+    outline: none; border-color: var(--green); background: #101610;
   }
   .input-wrap .send-icon {
     position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
-    background: var(--green); color: #fff;
-    border: none; border-radius: 7px;
-    padding: 7px 14px; font-size: 12.5px;
-    font-weight: 600; cursor: pointer;
-    transition: opacity 0.15s, transform 0.1s;
-    font-family: inherit;
+    background: var(--green); color: #fff; border: none; border-radius: 7px;
+    padding: 7px 14px; font-size: 12.5px; font-weight: 600; cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s; font-family: inherit;
   }
   .input-wrap .send-icon:hover { opacity: 0.9; transform: translateY(-50%) scale(1.02); }
   .input-wrap .send-icon:disabled { opacity: 0.3; cursor: default; }
-
   .prompt-preview {
     font-size:13px; color:#404040; font-style:italic; flex:1; margin-right:8px;
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
@@ -457,26 +571,21 @@
     transition:opacity 0.15s,transform 0.1s; white-space:nowrap;
     letter-spacing: 0.01em; font-family: inherit;
   }
-  .btn-next:hover  { opacity:0.88; transform:translateY(-1px); }
+  .btn-next:hover { opacity:0.88; transform:translateY(-1px); }
   .btn-next:active { transform:translateY(0); }
   .btn-next:disabled { opacity:0.3; cursor:default; transform:none; }
   .btn-restart {
-    background:#1a1a1a; color:#5a5a5a;
-    border:1px solid #2a2a2a; border-radius:8px;
+    background:#1a1a1a; color:#5a5a5a; border:1px solid #2a2a2a; border-radius:8px;
     padding:8px 14px; font-size:12.5px; cursor:pointer;
-    transition:background 0.15s, color 0.15s;
-    font-family: inherit;
+    transition:background 0.15s, color 0.15s; font-family: inherit;
   }
   .btn-restart:hover { background:#222222; color:#7a7a7a; }
   .counter {
-    font-size:11.5px; color:#2e3e2e;
-    font-family: 'SF Mono', monospace;
-    padding: 4px 9px; background: #0d120d; border-radius: 4px;
-    border: 1px solid #1a2a1a;
+    font-size:11.5px; color:#2e3e2e; font-family: 'SF Mono', monospace;
+    padding: 4px 9px; background: #0d120d; border-radius: 4px; border: 1px solid #1a2a1a;
   }
   .install-link {
-    font-size: 12px; color: #5a7a5a;
-    text-decoration: none;
+    font-size: 12px; color: #5a7a5a; text-decoration: none;
     padding: 5px 0; white-space: nowrap;
   }
   .install-link:hover { color: var(--green-bright); }
@@ -495,6 +604,7 @@
     .completion h2 { font-size: 22px; }
     .completion-actions { flex-direction: column; }
     .cta-primary, .cta-secondary { width: 100%; justify-content: center; }
+    .modal { padding: 22px 18px; max-width: 100%; }
   }
 </style>
 </head>
@@ -516,11 +626,16 @@
     <div class="logo-divider"></div>
     <div class="logo-sub">MCP Server · HubSpot · AMS 360 · HawkSoft · SnapRefund</div>
   </div>
-  <div class="status-pill">
-    <div class="status-dot"></div>
-    Mock demo · ready for live HubSpot
-  </div>
+  <button class="status-pill disconnected" id="connect-btn" onclick="openConnectModal()">
+    <span class="status-dot"></span>
+    <span id="status-text">Connect your HubSpot →</span>
+  </button>
 </header>
+
+<div class="live-banner" id="live-banner">
+  ⚡ <strong>Live mode</strong> — Daily briefing &amp; renewal pipeline now use your real HubSpot. Other prompts remain mock for demo safety.
+  <button class="disconnect-link" onclick="disconnectHubSpot()">Disconnect</button>
+</div>
 
 <div class="layout">
   <div class="sidebar" id="sidebar"></div>
@@ -573,19 +688,509 @@
   </div>
 </div>
 
+<!-- ============================================================== -->
+<!-- HubSpot Connect Modal                                          -->
+<!-- ============================================================== -->
+<div class="modal-backdrop" id="connect-modal">
+  <div class="modal" style="position: relative;">
+    <button class="modal-close" onclick="closeConnectModal()">×</button>
+    <h2>Connect your HubSpot</h2>
+    <p class="modal-lede">
+      Run the AgentSnap demo against your real HubSpot data. Read-only, browser-only — your token stays in this tab.
+    </p>
+
+    <div class="privacy-block">
+      <span class="lock">🔒</span> <strong>Privacy:</strong> Your token stays in this browser tab and is <strong>never stored on AgentSnap's servers</strong>. Requests proxy through a stateless Cloudflare Worker that does not log tokens. Close this tab and your token is gone.
+    </div>
+
+    <details class="token-help">
+      <summary>How do I get a HubSpot private-app token?</summary>
+      <div class="help-body">
+        <ol>
+          <li>In HubSpot, click the <strong>settings gear</strong> (top right).</li>
+          <li>Left sidebar: <strong>Integrations → Private Apps</strong>.</li>
+          <li>Click <strong>Create a private app</strong>, name it "AgentSnap Demo".</li>
+          <li>On the <strong>Scopes</strong> tab, enable these read-only scopes:
+            <ul style="margin-top:6px;">
+              <li><code>crm.objects.contacts.read</code></li>
+              <li><code>crm.objects.deals.read</code></li>
+              <li><code>crm.schemas.contacts.read</code></li>
+            </ul>
+          </li>
+          <li>Click <strong>Create app</strong> at the top right.</li>
+          <li>Copy the access token (starts with <code>pat-na1-…</code>) and paste it below.</li>
+        </ol>
+      </div>
+    </details>
+
+    <label class="input-label" for="token-input">HubSpot Private-App Token</label>
+    <input
+      type="password"
+      class="token-input"
+      id="token-input"
+      placeholder="pat-na1-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+      autocomplete="off"
+      spellcheck="false"
+    />
+
+    <div class="modal-actions">
+      <button class="modal-btn cancel" onclick="closeConnectModal()">Cancel</button>
+      <button class="modal-btn primary" id="connect-submit" onclick="submitConnect()">Connect →</button>
+    </div>
+
+    <div class="connect-status" id="connect-status"></div>
+  </div>
+</div>
+
 <script>
 // ============================================================================
+//   CONFIGURATION
+// ============================================================================
+
+// Cloudflare Worker URL — change this after deploying your own proxy.
+// Deployment guide: agentsnap-hubspot-proxy/README.md in the same git repo.
+const HUBSPOT_PROXY_URL = 'https://agentsnap-hubspot-proxy.aisoundz.workers.dev';
+
+// AgentSnap's expected custom property names, with fuzzy-match aliases for
+// auto-detection against an agency's actual HubSpot custom property names.
+const PROPERTY_ALIASES = {
+  policy_type:            ['policy_type', 'policy_line', 'line_of_business', 'lob', 'product', 'policy'],
+  carrier:                ['carrier', 'carrier_name', 'insurer', 'insurance_company', 'company'],
+  policy_premium:         ['policy_premium', 'annual_premium', 'premium', 'gross_premium', 'policy_amount'],
+  policy_effective_date:  ['policy_effective_date', 'effective_date', 'policy_start_date', 'start_date'],
+  policy_expiration_date: ['policy_expiration_date', 'expiration_date', 'renewal_date', 'expires_on', 'expiry'],
+  policy_number:          ['policy_number', 'policy_id', 'policy_no', 'policy_ref'],
+};
+
+// ============================================================================
+//   HUBSPOT CLIENT (browser → Cloudflare Worker → HubSpot)
+// ============================================================================
+
+class HubSpotClient {
+  constructor(token) {
+    this.token = token;
+    this.propertyMap = {}; // populated on connect via detectProperties()
+    this.accountInfo = null;
+    this.contactCount = 0;
+  }
+
+  async _call(path, opts = {}) {
+    const res = await fetch(HUBSPOT_PROXY_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-HubSpot-Token': this.token,
+      },
+      body: JSON.stringify({
+        path,
+        method: opts.method || 'GET',
+        params: opts.params || null,
+        body:   opts.body   || null,
+      }),
+    });
+    const text = await res.text();
+    let data;
+    try { data = text ? JSON.parse(text) : null; } catch { data = null; }
+    if (!res.ok) {
+      const msg = (data && (data.message || data.error)) || text || `HTTP ${res.status}`;
+      throw new Error(`HubSpot ${res.status}: ${msg}`);
+    }
+    return data;
+  }
+
+  async getAccountInfo() {
+    const info = await this._call('/account-info/v3/details');
+    this.accountInfo = info;
+    return info;
+  }
+
+  async getContactProperties() {
+    return this._call('/crm/v3/properties/contacts');
+  }
+
+  async getContactCount() {
+    // Use search with no filter and limit 1 — total comes back in `total`
+    const res = await this._call('/crm/v3/objects/contacts/search', {
+      method: 'POST',
+      body: { filterGroups: [], properties: ['email'], limit: 1 },
+    });
+    this.contactCount = res.total || 0;
+    return this.contactCount;
+  }
+
+  async listExpiringWithin(daysAhead) {
+    const expProp = this.propertyMap.policy_expiration_date;
+    if (!expProp) throw new Error('No policy_expiration_date property mapped in your HubSpot.');
+
+    const today = new Date().toISOString().slice(0, 10);
+    const cutoff = new Date(Date.now() + daysAhead * 86400000).toISOString().slice(0, 10);
+
+    const props = ['firstname', 'lastname', 'email', 'phone'];
+    Object.values(this.propertyMap).forEach(p => { if (p && !props.includes(p)) props.push(p); });
+
+    const res = await this._call('/crm/v3/objects/contacts/search', {
+      method: 'POST',
+      body: {
+        filterGroups: [{
+          filters: [
+            { propertyName: expProp, operator: 'GTE', value: today },
+            { propertyName: expProp, operator: 'LTE', value: cutoff },
+          ],
+        }],
+        properties: props,
+        sorts: [{ propertyName: expProp, direction: 'ASCENDING' }],
+        limit: 50,
+      },
+    });
+    return (res.results || []).map(r => this._normalizeContact(r));
+  }
+
+  async searchContacts(query) {
+    const props = ['firstname', 'lastname', 'email', 'phone'];
+    Object.values(this.propertyMap).forEach(p => { if (p && !props.includes(p)) props.push(p); });
+
+    const res = await this._call('/crm/v3/objects/contacts/search', {
+      method: 'POST',
+      body: {
+        query,
+        properties: props,
+        limit: 10,
+      },
+    });
+    return (res.results || []).map(r => this._normalizeContact(r));
+  }
+
+  _normalizeContact(r) {
+    const p = r.properties || {};
+    return {
+      id: r.id,
+      firstname: p.firstname || '',
+      lastname: p.lastname || '',
+      email: p.email || '',
+      phone: p.phone || '',
+      policy_type:            p[this.propertyMap.policy_type]            || null,
+      carrier:                p[this.propertyMap.carrier]                || null,
+      policy_premium:         p[this.propertyMap.policy_premium]         || null,
+      policy_effective_date:  p[this.propertyMap.policy_effective_date]  || null,
+      policy_expiration_date: p[this.propertyMap.policy_expiration_date] || null,
+      policy_number:          p[this.propertyMap.policy_number]          || null,
+    };
+  }
+}
+
+// ============================================================================
+//   PROPERTY AUTO-DETECTION via fuzzy match
+// ============================================================================
+
+function detectPropertyMapping(propertyList) {
+  const mapping = {};
+  const usedSources = new Set();
+
+  const names = propertyList.map(p => ({ name: p.name, label: p.label }));
+
+  for (const [target, aliases] of Object.entries(PROPERTY_ALIASES)) {
+    // First try exact match
+    let best = null;
+    for (const alias of aliases) {
+      const found = names.find(p => p.name.toLowerCase() === alias.toLowerCase());
+      if (found && !usedSources.has(found.name)) {
+        best = found;
+        break;
+      }
+    }
+    // Then try contains-match on label or name
+    if (!best) {
+      for (const alias of aliases) {
+        const found = names.find(p =>
+          (p.name.toLowerCase().includes(alias.toLowerCase()) ||
+           (p.label || '').toLowerCase().includes(alias.toLowerCase())) &&
+          !usedSources.has(p.name)
+        );
+        if (found) { best = found; break; }
+      }
+    }
+    if (best) {
+      mapping[target] = best.name;
+      usedSources.add(best.name);
+    }
+  }
+  return mapping;
+}
+
+// ============================================================================
+//   CONNECT / DISCONNECT FLOW
+// ============================================================================
+
+let hubspotClient = null;
+
+function openConnectModal() {
+  document.getElementById('connect-modal').classList.add('open');
+  document.getElementById('connect-status').className = 'connect-status';
+  document.getElementById('connect-status').innerHTML = '';
+  document.getElementById('token-input').focus();
+}
+
+function closeConnectModal() {
+  document.getElementById('connect-modal').classList.remove('open');
+}
+
+async function submitConnect() {
+  const tokenInput = document.getElementById('token-input');
+  const token = tokenInput.value.trim();
+  const status = document.getElementById('connect-status');
+  const submitBtn = document.getElementById('connect-submit');
+
+  if (!token) {
+    status.className = 'connect-status error';
+    status.textContent = 'Please paste your HubSpot token.';
+    return;
+  }
+  if (!token.startsWith('pat-')) {
+    status.className = 'connect-status error';
+    status.textContent = 'That does not look like a HubSpot private-app token. They start with "pat-".';
+    return;
+  }
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Connecting…';
+  status.className = 'connect-status';
+  status.innerHTML = '';
+  setConnectButton('connecting');
+
+  try {
+    const client = new HubSpotClient(token);
+    const account = await client.getAccountInfo();
+
+    let props;
+    try {
+      props = await client.getContactProperties();
+    } catch (e) {
+      throw new Error(`Connected to portal #${account.portalId}, but couldn't read contact properties. The token may be missing the contacts.read scope.`);
+    }
+
+    client.propertyMap = detectPropertyMapping(props.results || []);
+    const mappedCount = Object.keys(client.propertyMap).length;
+    if (mappedCount === 0) {
+      throw new Error(`Connected to portal #${account.portalId}, but couldn't find any policy-related custom properties on your contacts. Make sure you have at least one of: ${Object.keys(PROPERTY_ALIASES).join(', ')} on your contacts.`);
+    }
+
+    // Try to count contacts (non-fatal if it fails)
+    let count = 0;
+    try { count = await client.getContactCount(); } catch {}
+
+    hubspotClient = client;
+    sessionStorage.setItem('hubspot_token', token);
+    sessionStorage.setItem('hubspot_property_map', JSON.stringify(client.propertyMap));
+    sessionStorage.setItem('hubspot_account', JSON.stringify({ portalId: account.portalId, contactCount: count }));
+
+    // Render success UI
+    const accountLabel = (account.companyName || account.uiDomain || `Portal #${account.portalId}`).toString();
+    let html = `✓ Connected to <strong>${escapeHtml(accountLabel)}</strong>`;
+    if (count > 0) html += ` · ${count.toLocaleString()} contacts`;
+    html += '<br>✓ Property mapping detected:<ul>';
+    for (const [target, source] of Object.entries(client.propertyMap)) {
+      const same = target === source;
+      html += `<li><code class="mapped">${escapeHtml(target)}</code>`;
+      if (!same) html += ` ← <code class="original">${escapeHtml(source)}</code>`;
+      else html += ` <span style="color:#5a7a5a;">(exact match)</span>`;
+      html += `</li>`;
+    }
+    html += '</ul>';
+    status.className = 'connect-status success';
+    status.innerHTML = html;
+
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Done — start the demo →';
+    submitBtn.onclick = () => {
+      closeConnectModal();
+      setConnectButton('connected', accountLabel);
+      showLiveBanner();
+    };
+
+  } catch (e) {
+    status.className = 'connect-status error';
+    status.innerHTML = '✗ ' + escapeHtml(e.message || 'Unknown error');
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Try again';
+    submitBtn.onclick = submitConnect;
+    setConnectButton('disconnected');
+  }
+}
+
+function setConnectButton(state, label) {
+  const btn = document.getElementById('connect-btn');
+  const txt = document.getElementById('status-text');
+  btn.classList.remove('disconnected', 'connecting', 'connected');
+  btn.classList.add(state);
+  if (state === 'disconnected') txt.textContent = 'Connect your HubSpot →';
+  else if (state === 'connecting') txt.textContent = 'Connecting…';
+  else if (state === 'connected') txt.textContent = `Live · ${label || 'HubSpot connected'}`;
+}
+
+function showLiveBanner() {
+  document.getElementById('live-banner').classList.add('visible');
+  // Mark live-capable sidebar items
+  document.querySelectorAll('.step-item').forEach(el => {
+    const idx = parseInt(el.dataset.idx || '-1', 10);
+    if (STEPS[idx] && STEPS[idx].liveResponse) {
+      el.classList.add('has-live');
+    }
+  });
+}
+
+function hideLiveBanner() {
+  document.getElementById('live-banner').classList.remove('visible');
+  document.querySelectorAll('.step-item.has-live').forEach(el => el.classList.remove('has-live'));
+}
+
+function disconnectHubSpot() {
+  hubspotClient = null;
+  sessionStorage.removeItem('hubspot_token');
+  sessionStorage.removeItem('hubspot_property_map');
+  sessionStorage.removeItem('hubspot_account');
+  setConnectButton('disconnected');
+  hideLiveBanner();
+}
+
+// Restore connection on page load if token in sessionStorage
+async function maybeRestoreConnection() {
+  const token = sessionStorage.getItem('hubspot_token');
+  const mapStr = sessionStorage.getItem('hubspot_property_map');
+  const accStr = sessionStorage.getItem('hubspot_account');
+  if (!token || !mapStr) return;
+  try {
+    hubspotClient = new HubSpotClient(token);
+    hubspotClient.propertyMap = JSON.parse(mapStr);
+    const account = accStr ? JSON.parse(accStr) : {};
+    setConnectButton('connected', `Portal #${account.portalId || '?'}`);
+    showLiveBanner();
+  } catch {
+    sessionStorage.clear();
+  }
+}
+
+// ============================================================================
+//   LIVE RESPONSE FUNCTIONS — for the 2 prompts that go live (briefing, pipeline)
+// ============================================================================
+
+function formatPremium(v) {
+  const n = parseFloat(v || 0);
+  if (isNaN(n) || n === 0) return '—';
+  return '$' + n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function daysUntil(iso) {
+  if (!iso) return null;
+  const target = new Date(iso);
+  const now = new Date(); now.setHours(0,0,0,0);
+  return Math.round((target - now) / 86400000);
+}
+
+function urgencyChip(days) {
+  if (days <= 7) return '<span class="chip red">urgent</span>';
+  if (days <= 30) return '<span class="chip gold">soon</span>';
+  return '<span class="chip">upcoming</span>';
+}
+
+async function liveBriefing(client) {
+  const urgentContacts = await client.listExpiringWithin(14);
+  const account = client.accountInfo || JSON.parse(sessionStorage.getItem('hubspot_account') || '{}');
+
+  if (urgentContacts.length === 0) {
+    return `<div class="badge live">⚡ Live Briefing · your HubSpot · ${new Date().toLocaleDateString()}</div>
+<p>Good news — no policies expiring in the next 14 days on your live book.</p>
+<p style="margin-top:10px;color:#888;font-size:13px;">Want to see your 90-day pipeline instead? Click <strong>Show me the renewal pipeline</strong> on the left, or ask <em>"what's renewing in the next 60 days"</em> below.</p>
+<p style="margin-top:14px;color:#5a7a5a;font-size:12.5px;font-style:italic;">Note: overdue invoices, open claims, and YTD commission don't appear here because AgentSnap's invoice + claim state lives in the local install. Install the MCP server locally to see those alongside this briefing.</p>`;
+  }
+
+  const rows = urgentContacts.slice(0, 8).map(c => {
+    const name = `${c.firstname} ${c.lastname}`.trim() || c.email || c.id;
+    const days = daysUntil(c.policy_expiration_date);
+    const dStr = days === 0 ? 'today' : days === 1 ? 'tomorrow' : `${days} days`;
+    return `<tr>
+      <td>${urgencyChip(days)}</td>
+      <td><strong>${escapeHtml(name)}</strong> — ${escapeHtml(c.carrier || 'unknown carrier')} ${escapeHtml(c.policy_type || '')} expires in <strong class="urgent">${dStr}</strong> (${formatPremium(c.policy_premium)})</td>
+    </tr>`;
+  }).join('');
+
+  return `<div class="badge live">⚡ Live Briefing · your HubSpot · ${new Date().toLocaleDateString()}</div>
+<p style="font-size:12px;color:#555555;margin-bottom:10px;">Priority action items pulled from your real HubSpot:</p>
+<table class="demo-table">${rows}</table>
+<p style="margin-top:14px;color:#5a7a5a;font-size:12.5px;font-style:italic;">Note: overdue invoices, claim status, and YTD commission don't appear here because AgentSnap's invoice/claim state lives in the local install. Install locally to see those alongside this briefing.</p>
+<p style="margin-top:10px;color:#888888;font-size:13px;">Want to pull the full renewal pipeline, or drill into a specific contact?</p>`;
+}
+
+async function livePipeline(client, days = 90) {
+  const contacts = await client.listExpiringWithin(days);
+  if (contacts.length === 0) {
+    return `<div class="badge live">⚡ Live Pipeline · 0 renewals in next ${days} days</div>
+<p>No policies expiring in the next ${days} days on your live HubSpot. Either your book is freshly renewed, or your <code class="mono">policy_expiration_date</code> field isn't populated yet.</p>`;
+  }
+
+  let totalPremium = 0;
+  const rows = contacts.map(c => {
+    const name = `${c.firstname} ${c.lastname}`.trim() || c.email || c.id;
+    const d = daysUntil(c.policy_expiration_date);
+    const dStr = d === 0 ? 'today' : d === 1 ? 'tomorrow' : `${d} days`;
+    const p = parseFloat(c.policy_premium || 0); totalPremium += (isNaN(p) ? 0 : p);
+    return `<tr>
+      <td><strong>${escapeHtml(name)}</strong></td>
+      <td>${escapeHtml(c.carrier || '—')}</td>
+      <td class="amt">${formatPremium(c.policy_premium)}</td>
+      <td>${dStr}</td>
+      <td>${urgencyChip(d)}</td>
+    </tr>`;
+  }).join('');
+
+  return `<div class="badge live">⚡ Live Pipeline · ${contacts.length} renewals in next ${days} days · ${formatPremium(totalPremium)} total premium</div>
+<table class="demo-table">
+  <tr><th>Policyholder</th><th>Carrier</th><th>Premium</th><th>Expires</th><th>Urgency</th></tr>
+  ${rows}
+</table>
+<p style="margin-top:10px;color:#888888;font-size:13px;">These contacts are from your live HubSpot. Want to drill into one? Type their name in the input box below (e.g., <em>"look up [name]"</em>).</p>`;
+}
+
+async function liveSearch(client, query) {
+  const results = await client.searchContacts(query);
+  if (results.length === 0) {
+    return `<div class="badge live">⚡ Live Search · no matches for "${escapeHtml(query)}"</div>
+<p>Nothing in your HubSpot matched. Try a different spelling, or use an email address.</p>`;
+  }
+  const rows = results.slice(0, 10).map(c => {
+    const name = `${c.firstname} ${c.lastname}`.trim() || c.email || c.id;
+    return `<tr>
+      <td><strong>${escapeHtml(name)}</strong></td>
+      <td>${escapeHtml(c.email || '—')}</td>
+      <td>${escapeHtml(c.carrier || '—')}</td>
+      <td>${escapeHtml(c.policy_type || '—')}</td>
+      <td class="amt">${formatPremium(c.policy_premium)}</td>
+    </tr>`;
+  }).join('');
+  return `<div class="badge live">⚡ Live Search · ${results.length} match${results.length > 1 ? 'es' : ''} in your HubSpot</div>
+<table class="demo-table">
+  <tr><th>Name</th><th>Email</th><th>Carrier</th><th>Policy</th><th>Premium</th></tr>
+  ${rows}
+</table>`;
+}
+
+function renderLiveError(err) {
+  return `<div class="badge warn">⚠ Live mode error</div>
+<p>${escapeHtml(err.message || String(err))}</p>
+<p style="margin-top:8px;color:#888;font-size:13px;">The mock response remains available — disconnect via the banner above and the demo will continue with seed data.</p>`;
+}
+
+// ============================================================================
 //   STEPS — 13 sequential workflow + 5 custom queries (18 total)
+//   Steps 0 and 1 have liveResponse functions; the rest are mock-only.
 // ============================================================================
 
 const STEPS = [
-  // ── 1. Daily Briefing ──
   {
-    nav: 0,
-    label: "Daily briefing",
+    nav: 0, label: "Daily briefing",
     user: "What do I have on my plate today?",
     tool: "agentsnap_get_daily_briefing",
     keywords: ["plate", "today", "morning", "briefing", "what's on", "priorities", "overview"],
+    liveResponse: async (c) => liveBriefing(c),
     response: `<div class="badge warn">⚠ Morning Briefing — May 20, 2026</div>
 <p style="font-size:12px;color:#555555;margin-bottom:10px;">Priority action items:</p>
 <table class="demo-table">
@@ -599,14 +1204,12 @@ const STEPS = [
 </table>
 <p style="margin-top:10px;color:#888888;font-size:13px;">Want me to pull up the full renewal pipeline, or start the most urgent renewal?</p>`
   },
-
-  // ── 2. Renewal Pipeline ──
   {
-    nav: 1,
-    label: "Renewal pipeline",
+    nav: 1, label: "Renewal pipeline",
     user: "Show me the full renewal pipeline for the next 90 days.",
     tool: "agentsnap_get_renewal_pipeline",
     keywords: ["renewal", "pipeline", "expir", "renewing", "renewals", "due"],
+    liveResponse: async (c) => livePipeline(c, 90),
     response: `<div class="badge info">8 renewals due in next 90 days · $19,150 current premium</div>
 <table class="demo-table">
   <tr><th>Policyholder</th><th>Carrier</th><th>Premium</th><th>Expires</th><th>Urgency</th></tr>
@@ -621,11 +1224,8 @@ const STEPS = [
 </table>
 <p style="margin-top:10px;color:#888888;font-size:13px;">Ready to start Sarah Johnson's renewal? Her policy is the cleanest small one — good warm-up before the bigger ones.</p>`
   },
-
-  // ── 3. Create Invoice ──
   {
-    nav: 2,
-    label: "Renew Sarah",
+    nav: 2, label: "Renew Sarah",
     user: "Let's renew Sarah Johnson at Hartford — same premium $1,480. Policy HF-AUTO-23491.",
     tool: "agentsnap_create_renewal_invoice",
     keywords: ["renew sarah", "sarah johnson", "create invoice sarah", "renew her"],
@@ -646,13 +1246,10 @@ const STEPS = [
   <tr><td>HubSpot Deal</td><td><span class="chip hub">deal_1716224130123</span> · associated with Sarah's contact</td></tr>
   <tr><td>Timeline Note</td><td style="color:#888;">"AgentSnap created renewal invoice $1,480.00 with Hartford..."</td></tr>
 </table>
-<p style="margin-top:10px;color:#888888;font-size:13px;">Audit log entry written. Send payment link to Sarah, or move to the next renewal?</p>`
+<p style="margin-top:10px;color:#888888;font-size:13px;">Audit log entry written. Write actions like this run on your real HubSpot only when you install the MCP locally — the spend cap, audit log, and HubSpot deal write happen safely there. Send payment link to Sarah, or move to the next renewal?</p>`
   },
-
-  // ── 4. Duplicate Catch ──
   {
-    nav: 3,
-    label: "Duplicate catch",
+    nav: 3, label: "Duplicate catch",
     user: "Now invoice Mike Chen at Progressive — $1,800, policy PG-BUND-88123.",
     tool: "agentsnap_create_renewal_invoice",
     keywords: ["mike chen invoice", "duplicate", "another invoice mike", "invoice mike"],
@@ -664,11 +1261,8 @@ const STEPS = [
 </table>
 <p style="margin-top:10px;color:#888888;font-size:13px;">Options: (1) send a payment reminder on the existing invoice, (2) cancel #5003 and reissue at $1,800, or (3) create the new one anyway and reconcile later. What do you want to do?</p>`
   },
-
-  // ── 5. Spend Cap ──
   {
-    nav: 4,
-    label: "Spend cap hold",
+    nav: 4, label: "Spend cap hold",
     user: "OK skip that — renew Robert Martinez's Hartford bundle, $7,820, policy HF-BUND-99001.",
     tool: "agentsnap_create_renewal_invoice",
     keywords: ["robert martinez", "spend cap", "big invoice", "$7,820", "renew robert", "hartford bundle"],
@@ -685,11 +1279,8 @@ const STEPS = [
 </table>
 <p style="margin-top:10px;color:#888888;font-size:13px;">Daily cap remaining: <span class="amt">$18,520 / $20,000</span>. Reply "yes" to confirm and I'll create the invoice + log to HubSpot.</p>`
   },
-
-  // ── 6. Confirmation ──
   {
-    nav: 5,
-    label: "Confirm",
+    nav: 5, label: "Confirm",
     user: "Yes, go ahead and confirm it.",
     tool: "agentsnap_confirm_action",
     keywords: ["yes confirm", "confirm action", "go ahead", "approve it", "yes go"],
@@ -706,11 +1297,8 @@ const STEPS = [
 </table>
 <p style="margin-top:10px;color:#888888;font-size:13px;">Daily spend so far: $9,300 / $20,000. Send payment link to Robert, or move on?</p>`
   },
-
-  // ── 7. Open Claim ──
   {
-    nav: 6,
-    label: "Open claim",
+    nav: 6, label: "Open claim",
     user: "Mike Chen just called — water damage in his basement, suspected slow leak. File a claim with Progressive on PG-BUND-88123.",
     tool: "agentsnap_create_claim",
     keywords: ["open claim", "file a claim", "water damage", "new claim", "mike chen claim", "fnol"],
@@ -728,11 +1316,8 @@ const STEPS = [
 </table>
 <p style="margin-top:10px;color:#888888;font-size:13px;">Timeline note added to Mike's HubSpot contact. Progressive will assign an adjuster. Want me to draft the FNOL notification email to Mike?</p>`
   },
-
-  // ── 8. List Claims ──
   {
-    nav: 7,
-    label: "List all claims",
+    nav: 7, label: "List all claims",
     user: "What are all our open claims right now?",
     tool: "agentsnap_list_claims",
     keywords: ["list claims", "all claims", "open claims", "claim status", "show claims"],
@@ -747,11 +1332,8 @@ const STEPS = [
 </table>
 <p style="margin-top:10px;color:#888888;font-size:13px;">Sarah's claim is the oldest active one — adjuster hasn't checked in for 8 days. Want to draft a follow-up to Hartford?</p>`
   },
-
-  // ── 9. Commission Status ──
   {
-    nav: 8,
-    label: "Commission status",
+    nav: 8, label: "Commission status",
     user: "What's our commission status this year? Show me the quarterly breakdown.",
     tool: "agentsnap_get_commission_status",
     keywords: ["commission", "earnings", "ytd", "made this year", "quarterly", "income", "earned"],
@@ -771,11 +1353,8 @@ const STEPS = [
 </table>
 <p style="margin-top:10px;color:#888888;font-size:13px;">Hartford was a strong Q1; Allstate is your Q2 leader so far. Derived live from paid invoices × each carrier's rate — no manual tracking needed.</p>`
   },
-
-  // ── 10. Refund ──
   {
-    nav: 9,
-    label: "Process refund",
+    nav: 9, label: "Process refund",
     user: "Process a $945 refund for Mike Chen — mid-term policy cancellation on his auto policy.",
     tool: "agentsnap_create_refund",
     keywords: ["refund", "cancellation", "return premium", "credit back"],
@@ -791,11 +1370,8 @@ const STEPS = [
 </table>
 <p style="margin-top:10px;color:#888888;font-size:13px;">Mike will receive a payment notification within 1 business day. HubSpot timeline note added. Refund is logged in the audit trail with full traceability.</p>`
   },
-
-  // ── 11. Bulk Reminders ──
   {
-    nav: 10,
-    label: "Draft reminders",
+    nav: 10, label: "Draft reminders",
     user: "Draft payment reminders for all overdue accounts.",
     tool: "agentsnap_bulk_draft_reminders",
     keywords: ["reminder", "overdue", "past due", "follow up payment", "draft email", "remind"],
@@ -809,11 +1385,8 @@ const STEPS = [
 </p>
 <p style="margin-top:10px;color:#888888;font-size:13px;"><strong style="color:#e8e8e8;">$2,210.00 total outstanding.</strong> Send it, or want me to soften the tone first?</p>`
   },
-
-  // ── 12. AMS 360 Sync ──
   {
-    nav: 11,
-    label: "AMS 360 sync",
+    nav: 11, label: "AMS 360 sync",
     user: "If we move Sarah's account to AMS 360 next quarter, what would the sync look like?",
     tool: "ams360_sync_invoice",
     keywords: ["ams 360", "ams360", "applied systems", "sync ams"],
@@ -832,11 +1405,8 @@ const STEPS = [
 </table>
 <p style="margin-top:10px;color:#888888;font-size:13px;">AgentSnap supports AMS 360 and HawkSoft natively. If you ever move off HubSpot, your data flows the same — no rewrites.</p>`
   },
-
-  // ── 13. HawkSoft Sync ──
   {
-    nav: 12,
-    label: "HawkSoft sync",
+    nav: 12, label: "HawkSoft sync",
     user: "And HawkSoft? Same idea?",
     tool: "hawksoft_sync_invoice",
     keywords: ["hawksoft", "sync hawksoft", "cms"],
@@ -854,11 +1424,8 @@ const STEPS = [
 </table>
 <p style="margin-top:10px;color:#888888;font-size:13px;">Same pattern. <strong style="color:#e8e8e8;">HubSpot · AMS 360 · HawkSoft — pick any of the three as your system of record.</strong> AgentSnap meets you where you are.</p>`
   },
-
-  // ── 14. HubSpot Sync Activity ──
   {
-    nav: 13,
-    label: "HubSpot activity",
+    nav: 13, label: "HubSpot activity",
     user: "Show me everything that's been synced to HubSpot today.",
     tool: "hubspot_recent_activity",
     keywords: ["hubspot today", "hubspot activity", "synced today", "what went to hubspot", "hubspot deals"],
@@ -875,11 +1442,8 @@ const STEPS = [
 </table>
 <p style="margin-top:10px;color:#888888;font-size:13px;">Every action above is also in <code class="mono">audit_log.jsonl</code> on disk. Want me to summarize the day's activity as a daily report email?</p>`
   },
-
-  // ── 15. Custom: Cross-Sell ──
   {
-    nav: 14,
-    label: "Cross-sell opps",
+    nav: 14, label: "Cross-sell opps",
     user: "Find me cross-sell opportunities — clients with only auto and no home or bundle.",
     tool: "agentsnap_cross_sell_search",
     keywords: ["cross sell", "cross-sell", "upsell", "no home", "only auto", "opportunities"],
@@ -893,11 +1457,8 @@ const STEPS = [
 </table>
 <p style="margin-top:10px;color:#888888;font-size:13px;">Sarah Johnson is your strongest signal — same carrier already, renewal in 13 days = natural conversation opening. Want me to draft a discovery message for her?</p>`
   },
-
-  // ── 16. Custom: Best Carrier ──
   {
-    nav: 15,
-    label: "Best carrier",
+    nav: 15, label: "Best carrier",
     user: "Which carrier is my best performer this year?",
     tool: "agentsnap_carrier_analysis",
     keywords: ["best carrier", "best performer", "top carrier", "carrier ranking", "which carrier", "carrier performance"],
@@ -911,11 +1472,8 @@ const STEPS = [
 </table>
 <p style="margin-top:10px;color:#888888;font-size:13px;"><strong style="color:#e8e8e8;">Hartford</strong> is your best mix: highest written premium, highest commission rate, low loss ratio, strongest retention. Progressive's loss ratio is concerning (Mike's claims) — worth a conversation with the underwriter.</p>`
   },
-
-  // ── 17. Custom: Renewal Email Draft ──
   {
-    nav: 16,
-    label: "Draft renewal email",
+    nav: 16, label: "Draft renewal email",
     user: "Draft a renewal reminder email to Sarah Johnson — her policy expires in 13 days.",
     tool: "agentsnap_draft_renewal_email",
     keywords: ["draft renewal", "renewal email", "email sarah", "draft email", "write email"],
@@ -938,11 +1496,8 @@ Just reply with answers and I'll have your renewal ready to sign by Friday.<br><
 </p>
 <p style="margin-top:10px;color:#888888;font-size:13px;">Tone tuned to your normal voice. Want me to send it, schedule it, or tweak anything first?</p>`
   },
-
-  // ── 18. Custom: Q3 Commission Projection ──
   {
-    nav: 17,
-    label: "Project Q3 commission",
+    nav: 17, label: "Project Q3 commission",
     user: "Project my Q3 commission based on the renewal pipeline.",
     tool: "agentsnap_commission_projection",
     keywords: ["project", "forecast", "projection", "q3", "expected commission", "next quarter", "predict"],
@@ -960,9 +1515,6 @@ Just reply with answers and I'll have your renewal ready to sign by Friday.<br><
   }
 ];
 
-// ============================================================================
-//   Sidebar groupings
-// ============================================================================
 const GROUPS = [
   { label: null,                    from: 0,  to: 5  },
   { label: "Claims",                from: 6,  to: 7  },
@@ -971,20 +1523,12 @@ const GROUPS = [
   { label: "Custom Agency Queries", from: 14, to: 17 }
 ];
 
-// ============================================================================
-//   STATE
-// ============================================================================
 let current = 0;
 let usedSet = new Set();
-
-// ============================================================================
-//   RENDER
-// ============================================================================
 
 function renderSidebar() {
   const sidebar = document.getElementById('sidebar');
   sidebar.innerHTML = '';
-
   const topLabel = document.createElement('div');
   topLabel.className = 'sidebar-label';
   topLabel.textContent = 'Morning Workflow';
@@ -1029,7 +1573,6 @@ function updateNav() {
 function addMessage(type, html) {
   const welcome = document.getElementById('welcome');
   if (welcome) welcome.remove();
-
   const messages = document.getElementById('messages');
   const row = document.createElement('div');
   row.className = `msg-row ${type}`;
@@ -1042,16 +1585,18 @@ function addMessage(type, html) {
   setTimeout(() => messages.scrollTop = messages.scrollHeight, 50);
 }
 
-function addToolCall(toolName) {
+function addToolCall(toolName, isLive) {
   const messages = document.getElementById('messages');
   const row = document.createElement('div');
   row.className = 'msg-row';
   row.style.padding = '2px 28px';
-  row.innerHTML = `<div style="max-width:880px;width:100%;margin:0 auto;"><div class="tool-call">🔧 ${toolName}()</div></div>`;
+  const cls = isLive ? 'tool-call live' : 'tool-call';
+  const suffix = isLive ? ' · live HubSpot' : '';
+  row.innerHTML = `<div style="max-width:880px;width:100%;margin:0 auto;"><div class="${cls}">${toolName}()${suffix}</div></div>`;
   messages.appendChild(row);
 }
 
-function runStep(idx) {
+async function runStep(idx) {
   if (idx < 0 || idx >= STEPS.length) return;
   const step = STEPS[idx];
   usedSet.add(idx);
@@ -1060,16 +1605,26 @@ function runStep(idx) {
   if (idx > current) current = idx + 1;
 
   addMessage('user', step.user);
-  setTimeout(() => {
-    addToolCall(step.tool);
-    setTimeout(() => {
-      addMessage('claude', step.response);
+
+  setTimeout(async () => {
+    const isLive = hubspotClient && step.liveResponse;
+    addToolCall(step.tool, isLive);
+    setTimeout(async () => {
+      let html;
+      if (isLive) {
+        try {
+          html = await step.liveResponse(hubspotClient);
+        } catch (e) {
+          html = renderLiveError(e);
+        }
+      } else {
+        html = step.response;
+      }
+      addMessage('claude', html);
       attachSuggestionClicks();
       updateNav();
       updateBottom();
-      if (current >= STEPS.length) {
-        showCompletion();
-      }
+      if (current >= STEPS.length) showCompletion();
     }, 400);
   }, 300);
 }
@@ -1091,8 +1646,7 @@ function updateBottom() {
     btn.textContent = 'Send Next ›';
     btn.disabled = false;
   } else {
-    previewWrap.innerHTML =
-      `<span style="color:#4ade80;">✓ All 18 prompts complete · type a custom one below or restart</span>`;
+    previewWrap.innerHTML = `<span style="color:#4ade80;">✓ All 18 prompts complete · type a custom one below or restart</span>`;
     btn.textContent = 'Done';
     btn.disabled = true;
   }
@@ -1100,9 +1654,7 @@ function updateBottom() {
 }
 
 function showCompletion() {
-  // Don't double-render if already shown
   if (document.getElementById('completion-block')) return;
-
   const messages = document.getElementById('messages');
   const block = document.createElement('div');
   block.className = 'completion';
@@ -1157,22 +1709,50 @@ function restart() {
 }
 
 // ============================================================================
-//   FREEFORM TEXT INPUT
+//   FREEFORM TEXT INPUT — with live search if connected
 // ============================================================================
 
-function handleCustomInput() {
+async function handleCustomInput() {
   const input = document.getElementById('custom-input');
   const text = input.value.trim();
   if (!text) return;
   input.value = '';
 
+  // If connected to HubSpot, check if this looks like a contact search
+  if (hubspotClient && looksLikeContactSearch(text)) {
+    const query = extractSearchQuery(text);
+    addMessage('user', escapeHtml(text));
+    setTimeout(async () => {
+      addToolCall('agentsnap_search_contact', true);
+      setTimeout(async () => {
+        try {
+          const html = await liveSearch(hubspotClient, query);
+          addMessage('claude', html);
+        } catch (e) {
+          addMessage('claude', renderLiveError(e));
+        }
+      }, 400);
+    }, 300);
+    return;
+  }
+
+  // Otherwise pattern-match against canned prompts
   const matched = findBestMatch(text);
   if (matched) {
     addMessage('user', escapeHtml(text));
-    setTimeout(() => {
-      addToolCall(STEPS[matched.idx].tool);
-      setTimeout(() => {
-        addMessage('claude', STEPS[matched.idx].response);
+    setTimeout(async () => {
+      const step = STEPS[matched.idx];
+      const isLive = hubspotClient && step.liveResponse;
+      addToolCall(step.tool, isLive);
+      setTimeout(async () => {
+        let html;
+        if (isLive) {
+          try { html = await step.liveResponse(hubspotClient); }
+          catch (e) { html = renderLiveError(e); }
+        } else {
+          html = step.response;
+        }
+        addMessage('claude', html);
         usedSet.add(matched.idx);
         if (matched.idx === current) current = matched.idx + 1;
         updateNav();
@@ -1190,6 +1770,17 @@ function handleCustomInput() {
   }
 }
 
+function looksLikeContactSearch(text) {
+  const t = text.toLowerCase();
+  return /\b(look up|find|search|show me)\s+\w+/i.test(t) ||
+         /\b(who is|tell me about)\s+\w+/i.test(t);
+}
+
+function extractSearchQuery(text) {
+  // Strip the leading verb to get just the name/query
+  return text.replace(/^(look up|find|search|show me|who is|tell me about)\s+/i, '').replace(/[?.!]+$/, '').trim();
+}
+
 function findBestMatch(text) {
   const t = text.toLowerCase();
   let bestScore = 0;
@@ -1197,14 +1788,9 @@ function findBestMatch(text) {
   STEPS.forEach((step, idx) => {
     let score = 0;
     step.keywords.forEach(k => {
-      if (t.includes(k.toLowerCase())) {
-        score += k.length;
-      }
+      if (t.includes(k.toLowerCase())) score += k.length;
     });
-    if (score > bestScore) {
-      bestScore = score;
-      bestIdx = idx;
-    }
+    if (score > bestScore) { bestScore = score; bestIdx = idx; }
   });
   return bestIdx >= 0 && bestScore > 2 ? { idx: bestIdx, score: bestScore } : null;
 }
@@ -1212,7 +1798,7 @@ function findBestMatch(text) {
 function renderNoMatchHelp(text) {
   const suggestions = [STEPS[0], STEPS[1], STEPS[8], STEPS[14], STEPS[16]];
   return `<div class="badge warn">Heads-up — this is a demo</div>
-<p>The demo only runs the 18 pre-loaded commands. <strong>To ask anything with your real data</strong>, install AgentSnap locally (5 minutes) and Claude will answer with the live model + your real HubSpot:</p>
+<p>The demo only runs the 18 pre-loaded commands${hubspotClient ? ' plus contact search against your live HubSpot' : ''}. <strong>To ask anything with your real data</strong>, install AgentSnap locally (5 minutes) and Claude will answer with the live model + your real HubSpot:</p>
 <p style="margin-top:8px;">
   <a href="https://github.com/aisoundz/agentsnap-hubspot-demo/releases/download/v1.0/agentsnap-hubspot-demo.zip" style="color:#4ade80;font-weight:600;text-decoration:none;border-bottom:1px dashed #2a4a2a;">↓ Download AgentSnap v1.0</a>
   &nbsp;·&nbsp;
@@ -1244,21 +1830,26 @@ function escapeHtml(s) {
   return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-// ============================================================================
-//   WIRE UP
-// ============================================================================
+// Close modal on backdrop click or Escape
+document.getElementById('connect-modal').addEventListener('click', (e) => {
+  if (e.target.id === 'connect-modal') closeConnectModal();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeConnectModal();
+});
+document.getElementById('token-input').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') { e.preventDefault(); submitConnect(); }
+});
 
 document.getElementById('custom-send').addEventListener('click', handleCustomInput);
 document.getElementById('custom-input').addEventListener('keydown', e => {
-  if (e.key === 'Enter') {
-    e.preventDefault();
-    handleCustomInput();
-  }
+  if (e.key === 'Enter') { e.preventDefault(); handleCustomInput(); }
 });
 
 renderSidebar();
 attachQuickStartClicks();
 updateBottom();
+maybeRestoreConnection();
 </script>
 </body>
 </html>
