@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AgentSnap MCP — HubSpot Edition</title>
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --bg-2: #111729;
+    --fg: #e7ecf3;
+    --fg-2: #9aa7bd;
+    --green: #2bd47e;
+    --green-dim: #15a35d;
+    --accent: #4f8cff;
+    --rule: #1f2940;
+    --card: #131a2e;
+    --code: #0f1424;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 64px 24px 96px; }
+
+  /* Hero */
+  .hero { padding: 28px 0 44px; border-bottom: 1px solid var(--rule); }
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--green);
+    border: 1px solid var(--green-dim);
+    padding: 4px 10px;
+    border-radius: 999px;
+    margin-bottom: 22px;
+  }
+  h1 {
+    font-size: clamp(34px, 5.4vw, 52px);
+    line-height: 1.05;
+    margin: 0 0 18px;
+    letter-spacing: -0.02em;
+    font-weight: 700;
+  }
+  .lede {
+    font-size: 19px;
+    color: var(--fg-2);
+    max-width: 720px;
+    margin: 0;
+  }
+
+  /* Section */
+  section { margin-top: 56px; }
+  h2 {
+    font-size: 22px;
+    margin: 0 0 18px;
+    letter-spacing: -0.01em;
+  }
+  h3 { font-size: 16px; margin: 22px 0 8px; color: var(--fg); }
+
+  p { color: var(--fg-2); margin: 0 0 12px; }
+  strong { color: var(--fg); font-weight: 600; }
+  em { color: var(--fg); font-style: normal; background: rgba(43, 212, 126, 0.1); padding: 1px 6px; border-radius: 3px; }
+
+  /* Two-column grid */
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-top: 22px;
+  }
+  @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-radius: 12px;
+    padding: 22px;
+  }
+  .card h3 { margin-top: 0; }
+  .card .tag {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  /* Demo chat sample */
+  .chat {
+    background: var(--bg-2);
+    border: 1px solid var(--rule);
+    border-radius: 14px;
+    padding: 20px;
+    margin-top: 18px;
+  }
+  .chat .turn { margin-bottom: 16px; }
+  .chat .turn:last-child { margin-bottom: 0; }
+  .chat .you {
+    color: var(--accent);
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .chat .claude {
+    color: var(--green);
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .chat .body {
+    background: var(--code);
+    border-left: 3px solid var(--rule);
+    padding: 12px 14px;
+    border-radius: 4px;
+    font-size: 14px;
+    color: var(--fg);
+  }
+  .chat .body code {
+    color: var(--green);
+    background: rgba(43, 212, 126, 0.08);
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 13px;
+  }
+
+  /* Step list */
+  ol.steps {
+    list-style: none;
+    padding: 0;
+    counter-reset: step;
+    margin-top: 18px;
+  }
+  ol.steps li {
+    counter-increment: step;
+    position: relative;
+    padding: 14px 18px 14px 52px;
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    margin-bottom: 10px;
+    color: var(--fg);
+  }
+  ol.steps li::before {
+    content: counter(step);
+    position: absolute;
+    left: 14px;
+    top: 14px;
+    width: 26px;
+    height: 26px;
+    background: var(--green);
+    color: var(--bg);
+    border-radius: 50%;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+  }
+  ol.steps li code {
+    color: var(--green);
+    background: rgba(43, 212, 126, 0.08);
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 13px;
+  }
+
+  /* Code block */
+  pre.code {
+    background: var(--code);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    padding: 16px 18px;
+    color: var(--fg);
+    font-family: "SF Mono", Menlo, Monaco, monospace;
+    font-size: 13px;
+    overflow-x: auto;
+    margin: 14px 0;
+  }
+  pre.code .c { color: var(--fg-2); }
+
+  /* Pills */
+  .pills { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+  .pill {
+    background: var(--bg-2);
+    border: 1px solid var(--rule);
+    color: var(--fg);
+    font-size: 13px;
+    padding: 6px 12px;
+    border-radius: 999px;
+  }
+
+  /* Footer / CTA */
+  .cta {
+    background: linear-gradient(135deg, #0a3a23 0%, #052718 100%);
+    border: 1px solid var(--green-dim);
+    border-radius: 14px;
+    padding: 28px;
+    margin-top: 36px;
+  }
+  .cta h2 { color: var(--green); margin-bottom: 8px; }
+  .cta p { color: var(--fg); }
+
+  footer {
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid var(--rule);
+    color: var(--fg-2);
+    font-size: 13px;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <span class="badge">SnapRefund · AgentSnap MCP</span>
+    <h1>The AI operations layer for agencies on HubSpot.</h1>
+    <p class="lede">
+      A working MCP server you install in Claude Desktop. Renewals, invoices, claims, commissions — done inside the chat interface your team already uses, with HubSpot as the system of record. Five-minute install, fully working with mock data, optional one-line switch to your live HubSpot.
+    </p>
+  </header>
+
+  <section>
+    <h2>What you actually get</h2>
+    <div class="grid">
+      <div class="card">
+        <span class="tag">Operations, not quoting</span>
+        <h3>9 tools wired to the daily work</h3>
+        <p>Daily briefing, renewal pipeline, customer lookup, invoice creation, claim opening, commission summary. Read-only and write tools, with safety gates on every write.</p>
+      </div>
+      <div class="card">
+        <span class="tag">HubSpot as the AMS</span>
+        <h3>Two-way sync, no AMS required</h3>
+        <p>Invoices show up in HubSpot as deals. Claims and renewals log as timeline notes on the contact. The activity lands where your team already looks.</p>
+      </div>
+      <div class="card">
+        <span class="tag">Built for safety</span>
+        <h3>Spend caps + audit log</h3>
+        <p>Per-transaction $5K limit; anything larger gets held with a confirmation prompt. $20K daily cap. Every action appends to a JSONL audit log you can read end of day.</p>
+      </div>
+      <div class="card">
+        <span class="tag">No vendor lock-in</span>
+        <h3>Runs locally on your Mac or PC</h3>
+        <p>The MCP server is a Python process talking to Claude Desktop over stdio. Your HubSpot token never leaves your machine. Source is plain Python — fork it, modify it, or wire it into your own internal stack.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>What it feels like</h2>
+    <div class="chat">
+      <div class="turn">
+        <div class="you">You</div>
+        <div class="body">What's on my plate today?</div>
+      </div>
+      <div class="turn">
+        <div class="claude">Claude · via AgentSnap</div>
+        <div class="body">
+          You've got <strong>4 urgent renewals</strong> in the next 14 days, <strong>1 overdue invoice</strong> ($2,210 with Mike Chen at Progressive), and <strong>3 open claims</strong>. YTD commission so far: $4,698, across all four carriers.<br><br>
+          The most urgent renewal is Robert Martinez — Hartford bundle, $7,820 premium, expires in 5 days. Want me to start the renewal?
+        </div>
+      </div>
+      <div class="turn">
+        <div class="you">You</div>
+        <div class="body">Yes, renew Robert.</div>
+      </div>
+      <div class="turn">
+        <div class="claude">Claude · via AgentSnap</div>
+        <div class="body">
+          The renewal is $7,820 — above the $5,000 per-transaction safety limit. <strong>Should I proceed?</strong> If yes, I'll create the invoice in AgentSnap, log it as a deal in HubSpot, and add a timeline note to Robert's contact record.
+        </div>
+      </div>
+      <div class="turn">
+        <div class="you">You</div>
+        <div class="body">Yes, confirm.</div>
+      </div>
+      <div class="turn">
+        <div class="claude">Claude · via AgentSnap</div>
+        <div class="body">
+          Done. Invoice <code>#5008</code> created. HubSpot deal <code>deal_1747...</code> created and associated with Robert. Timeline note added: "AgentSnap created renewal invoice $7,820.00 with Hartford (policy HF-BUND-99001)." <br><br>
+          Want me to send Robert the payment link, or move to the next renewal?
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Try these prompts after you install</h2>
+    <ol class="steps">
+      <li>What's on my plate today?</li>
+      <li>Show me everyone whose policy expires in the next 30 days.</li>
+      <li>Look up Robert Martinez.</li>
+      <li>Renew Sarah Johnson's policy.</li>
+      <li>Renew Robert Martinez's Hartford policy. <em>triggers the spend cap</em></li>
+      <li>Yes, confirm.</li>
+      <li>Open a property claim for Mike Chen — water damage to the basement.</li>
+      <li>How much commission did I earn this quarter?</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>Install in 5 minutes</h2>
+    <p>You need Python 3.10+ and Claude Desktop. Mock data works out of the box; live HubSpot mode takes an extra 2 minutes for the private app token.</p>
+
+    <pre class="code"><span class="c"># 1. Unzip wherever you like</span>
+cd ~/Documents/agentsnap-hubspot-demo
+
+<span class="c"># 2. Python environment</span>
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+
+<span class="c"># 3. Sanity check</span>
+python -c "import server; print('OK')"
+
+<span class="c"># 4. Wire into Claude Desktop — see INSTALL.md</span>
+<span class="c">#    Restart Claude. Done.</span></pre>
+
+    <div class="pills">
+      <span class="pill">macOS / Windows / Linux</span>
+      <span class="pill">Python 3.10+</span>
+      <span class="pill">Claude Desktop</span>
+      <span class="pill">HubSpot (optional)</span>
+    </div>
+  </section>
+
+  <section>
+    <h2>Why MCP, not another web app</h2>
+    <p>
+      Most insurance AI tools today are standalone platforms — you log into one more browser tab and copy-paste between it and your AMS or CRM. That's friction your team won't sustain.
+    </p>
+    <p>
+      AgentSnap is built on the Model Context Protocol, which means it runs <strong>inside</strong> the chat interface your team already uses — Claude Desktop today, ChatGPT and any other MCP-capable client tomorrow. Same prompt window, same workflow. The integration disappears.
+    </p>
+    <p>
+      And because the tools call out to HubSpot and SnapRefund's payment infrastructure under the hood, the AI is doing real work — creating real deals, writing real timeline notes, advancing real renewals — not generating prose about what it would do.
+    </p>
+  </section>
+
+  <section>
+    <div class="cta">
+      <h2>Ready to try it?</h2>
+      <p>The package is in your email. Mock mode works in five minutes. Live HubSpot mode is two minutes more, and Claude will be reading and writing your real contacts.</p>
+      <p>Hit reply with anything that breaks, anything that feels wrong, or anything that surprises you. The patch usually ships the same week.</p>
+    </div>
+  </section>
+
+  <footer>
+    Built by Anis Taylor and the SnapRefund team. AgentSnap MCP · v0.3 · May 2026.<br>
+    Questions? <a href="mailto:anis.taylor@snaprefund.net">anis.taylor@snaprefund.net</a>
+  </footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,7 @@
+__pycache__/
+*.py[cod]
+*.so
+.venv/
+audit_log.jsonl
+.DS_Store
+*.log
