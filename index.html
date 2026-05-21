@@ -612,7 +612,7 @@
 
 <header>
   <div class="logo">
-    <a class="logo-link" href="https://github.com/aisoundz/agentsnap-hubspot-demo" target="_blank">
+    <a class="logo-link" href="https://aisoundz.github.io/agentsnap-hubspot-demo/" target="_self">
       <img src="agentsnap-logo.svg"
            alt="AgentSnap"
            class="logo-img"
@@ -682,7 +682,8 @@
           />
           <button class="send-icon" id="custom-send">Send ↵</button>
         </div>
-        <a href="https://github.com/aisoundz/agentsnap-hubspot-demo" class="install-link" target="_blank">View source ↗</a>
+        <!-- View source link removed from public UI - shared selectively via email instead -->
+
       </div>
     </div>
   </div>
@@ -1825,8 +1826,6 @@ function renderNoMatchHelp(text) {
 <p>The demo only runs the 18 pre-loaded commands${hubspotClient ? ' plus contact search against your live HubSpot' : ''}. <strong>To ask anything with your real data</strong>, install AgentSnap locally (5 minutes) and Claude will answer with the live model + your real HubSpot:</p>
 <p style="margin-top:8px;">
   <a href="https://github.com/aisoundz/agentsnap-hubspot-demo/releases/download/v1.0/agentsnap-hubspot-demo.zip" style="color:#4ade80;font-weight:600;text-decoration:none;border-bottom:1px dashed #2a4a2a;">↓ Download AgentSnap v1.0</a>
-  &nbsp;·&nbsp;
-  <a href="https://github.com/aisoundz/agentsnap-hubspot-demo" target="_blank" style="color:#6dcf6d;">View source</a>
 </p>
 <p style="margin-top:14px;color:#888888;font-size:13px;">In the meantime, here are demo prompts that might be close to "${escapeHtml(text.slice(0, 40))}${text.length > 40 ? '…' : ''}":</p>
 <div class="suggestions">
