@@ -751,16 +751,21 @@
 // Deployment guide: agentsnap-hubspot-proxy/README.md in the same git repo.
 const HUBSPOT_PROXY_URL = 'https://agentsnap-hubspot-proxy.vercel.app/api/hubspot-proxy';
 
-// AgentSnap's expected custom property names, with fuzzy-match aliases for
-// auto-detection against an agency's actual HubSpot custom property names.
+// AgentSnap's expected custom property names. Aliases are deliberately
+// insurance-specific to avoid false matches against generic HubSpot fields
+// (e.g., the standard "company" field is NOT a valid carrier match).
 const PROPERTY_ALIASES = {
-  policy_type:            ['policy_type', 'policy_line', 'line_of_business', 'lob', 'product', 'policy'],
-  carrier:                ['carrier', 'carrier_name', 'insurer', 'insurance_company', 'company'],
-  policy_premium:         ['policy_premium', 'annual_premium', 'premium', 'gross_premium', 'policy_amount'],
-  policy_effective_date:  ['policy_effective_date', 'effective_date', 'policy_start_date', 'start_date'],
-  policy_expiration_date: ['policy_expiration_date', 'expiration_date', 'renewal_date', 'expires_on', 'expiry'],
-  policy_number:          ['policy_number', 'policy_id', 'policy_no', 'policy_ref'],
+  policy_type:            ['policy_type', 'policy_line', 'policy_line_of_business', 'line_of_business', 'policy_product'],
+  carrier:                ['carrier', 'carrier_name', 'insurance_carrier', 'insurer', 'insurance_company'],
+  policy_premium:         ['policy_premium', 'annual_premium', 'gross_premium', 'policy_amount', 'policy_cost'],
+  policy_effective_date:  ['policy_effective_date', 'policy_start_date', 'policy_inception_date'],
+  policy_expiration_date: ['policy_expiration_date', 'policy_renewal_date', 'renewal_date', 'policy_end_date', 'expiration_date'],
+  policy_number:          ['policy_number', 'policy_no', 'policy_id', 'policy_ref', 'policy_identifier'],
 };
+
+// Live mode requires this property to be mapped; without it, briefing &
+// pipeline can't work and we surface a clear error instead of fake-success.
+const REQUIRED_PROPERTIES_FOR_LIVE_MODE = ['policy_expiration_date'];
 
 // ============================================================================
 //   HUBSPOT CLIENT (browser → Cloudflare Worker → HubSpot)
@@ -886,29 +891,44 @@ function detectPropertyMapping(propertyList) {
   const mapping = {};
   const usedSources = new Set();
 
-  const names = propertyList.map(p => ({ name: p.name, label: p.label }));
+  // Exclude HubSpot system properties (hs_*) — they shouldn't ever match
+  // an insurance custom field. Also exclude well-known standard fields
+  // that aren't insurance-specific.
+  const HUBSPOT_STANDARD_BLOCKLIST = new Set([
+    'company', 'website', 'jobtitle', 'industry', 'lifecyclestage',
+    'firstname', 'lastname', 'email', 'phone', 'mobilephone',
+    'address', 'city', 'state', 'zip', 'country',
+    'createdate', 'lastmodifieddate', 'closedate', 'numemployees',
+  ]);
+  const candidates = propertyList
+    .map(p => ({ name: p.name }))
+    .filter(p => !p.name.startsWith('hs_'))
+    .filter(p => !HUBSPOT_STANDARD_BLOCKLIST.has(p.name.toLowerCase()));
 
   for (const [target, aliases] of Object.entries(PROPERTY_ALIASES)) {
-    // First try exact match
     let best = null;
+
+    // Strategy 1: exact match on the property's internal name.
     for (const alias of aliases) {
-      const found = names.find(p => p.name.toLowerCase() === alias.toLowerCase());
-      if (found && !usedSources.has(found.name)) {
-        best = found;
-        break;
-      }
+      const found = candidates.find(p =>
+        p.name.toLowerCase() === alias.toLowerCase() && !usedSources.has(p.name)
+      );
+      if (found) { best = found; break; }
     }
-    // Then try contains-match on label or name
+
+    // Strategy 2: "contains" match — only for aliases specific enough to
+    // be unambiguous. Requires alias to be 8+ chars OR contain underscore.
+    // This prevents short generic words from over-matching.
     if (!best) {
       for (const alias of aliases) {
-        const found = names.find(p =>
-          (p.name.toLowerCase().includes(alias.toLowerCase()) ||
-           (p.label || '').toLowerCase().includes(alias.toLowerCase())) &&
-          !usedSources.has(p.name)
+        if (alias.length < 8 && !alias.includes('_')) continue;
+        const found = candidates.find(p =>
+          p.name.toLowerCase().includes(alias.toLowerCase()) && !usedSources.has(p.name)
         );
         if (found) { best = found; break; }
       }
     }
+
     if (best) {
       mapping[target] = best.name;
       usedSources.add(best.name);
@@ -971,7 +991,11 @@ async function submitConnect() {
     client.propertyMap = detectPropertyMapping(props.results || []);
     const mappedCount = Object.keys(client.propertyMap).length;
     if (mappedCount === 0) {
-      throw new Error(`Connected to portal #${account.portalId}, but couldn't find any policy-related custom properties on your contacts. Make sure you have at least one of: ${Object.keys(PROPERTY_ALIASES).join(', ')} on your contacts.`);
+      throw new Error(`Connected to portal #${account.portalId}, but no insurance-specific custom properties were found on your contacts. Live mode needs at least: policy_expiration_date (date), policy_premium (number), carrier (text). Add these to your contacts in HubSpot Settings → Properties → Contact properties.`);
+    }
+    const missingRequired = REQUIRED_PROPERTIES_FOR_LIVE_MODE.filter(p => !client.propertyMap[p]);
+    if (missingRequired.length > 0) {
+      throw new Error(`Connected to portal #${account.portalId}, but the live demo needs a "${missingRequired.join('", "')}" date property on your contacts. The demo found ${mappedCount} other field${mappedCount > 1 ? 's' : ''}, but without an expiration date there's nothing to pipeline. In HubSpot: Settings → Properties → Contact properties → Create a Date picker property named "policy_expiration_date" (or "renewal_date" or "policy_end_date"), set it on a few contacts, then reconnect.`);
     }
 
     // Try to count contacts (non-fatal if it fails)
